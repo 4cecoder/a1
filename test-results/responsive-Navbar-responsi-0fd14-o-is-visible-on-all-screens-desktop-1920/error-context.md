@@ -197,9 +197,6 @@ Call log:
         - img [ref=e206]
         - generic [ref=e212]: A1 CUTS
       - paragraph [ref=e213]: © 2025 A1 Cuts · Columbia, SC
-  - button "Open Next.js Dev Tools" [ref=e219] [cursor=pointer]:
-    - img [ref=e220]
-  - alert [ref=e223]
 ```
 
 # Test source
