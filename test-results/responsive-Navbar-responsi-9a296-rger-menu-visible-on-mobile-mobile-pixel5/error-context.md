@@ -6,37 +6,30 @@
 
 # Test info
 
-- Name: responsive.spec.ts >> Hero section >> stats row visible
-- Location: tests/e2e/responsive.spec.ts:74:7
+- Name: responsive.spec.ts >> Navbar responsiveness >> hamburger menu visible on mobile
+- Location: tests/e2e/responsive.spec.ts:32:7
 
 # Error details
 
 ```
 Error: expect(locator).toBeVisible() failed
 
-Locator: locator('text=Expert Barbers')
+Locator: locator('nav button')
 Expected: visible
 Timeout: 5000ms
 Error: element(s) not found
 
 Call log:
   - Expect "toBeVisible" with timeout 5000ms
-  - waiting for locator('text=Expert Barbers')
+  - waiting for locator('nav button')
 
 ```
 
 ```yaml
-- navigation:
+- banner:
   - link "A1 CUTS":
     - /url: "#hero"
-  - link "Services":
-    - /url: "#services"
-  - link "Barbers":
-    - /url: "#barbers"
-  - link "Contact":
-    - /url: "#contact"
-  - link "Book Now":
-    - /url: tel:8037832993
+  - button
 - text: EST. 2010 COLUMBIA, SC
 - heading "A1 CUTS" [level=1]
 - paragraph: Premium cuts. Classic craft. Walk in looking good, walk out looking great.
@@ -44,7 +37,7 @@ Call log:
   - /url: tel:8037832993
 - link "VIEW SERVICES":
   - /url: "#services"
-- text: 10+ Years Open 3 Barbers 5★ Rated What We Do
+- text: 10+ Years Open 3 Expert Barbers 5★ Rated What We Do
 - heading "Services" [level=2]
 - heading "Classic Cut" [level=3]
 - paragraph: Clean, sharp, timeless.
@@ -89,9 +82,7 @@ Call log:
 - paragraph: Walk-ins welcome. Appointments recommended.
 - link "(803) 783-2993":
   - /url: tel:8037832993
-- contentinfo:
-  - text: A1 CUTS
-  - paragraph: © 2025 A1 Cuts · Columbia, SC
+- contentinfo: A1 CUTS © 2025 A1 Cuts · Columbia, SC
 - alert
 ```
 
@@ -134,7 +125,8 @@ Call log:
   34  |     if (vp.width < 768) {
   35  |       // hamburger button (Menu icon)
   36  |       const hamburger = page.locator("nav button");
-  37  |       await expect(hamburger).toBeVisible();
+> 37  |       await expect(hamburger).toBeVisible();
+      |                               ^ Error: expect(locator).toBeVisible() failed
   38  |       // desktop nav should be hidden
   39  |       const desktopLinks = page.locator(".hidden.md\\:flex");
   40  |       await expect(desktopLinks).toBeHidden();
@@ -173,8 +165,7 @@ Call log:
   73  | 
   74  |   test("stats row visible", async ({ page }) => {
   75  |     await expect(page.locator("text=Years Open")).toBeVisible();
-> 76  |     await expect(page.locator("text=Expert Barbers")).toBeVisible();
-      |                                                       ^ Error: expect(locator).toBeVisible() failed
+  76  |     await expect(page.locator("text=Expert Barbers")).toBeVisible();
   77  |   });
   78  | });
   79  | 
@@ -236,24 +227,4 @@ Call log:
   135 |   });
   136 | 
   137 |   test("get directions link present", async ({ page }) => {
-  138 |     const link = page.locator("text=Get Directions");
-  139 |     await expect(link).toBeVisible();
-  140 |     await expect(link).toHaveAttribute("href", /maps\.google\.com/);
-  141 |   });
-  142 | });
-  143 | 
-  144 | test.describe("No horizontal scroll on any viewport", () => {
-  145 |   const sections = ["#hero", "#services", "#barbers", "#contact"];
-  146 | 
-  147 |   for (const section of sections) {
-  148 |     test(`no overflow at ${section}`, async ({ page }) => {
-  149 |       await page.goto("/");
-  150 |       await page.locator(section).scrollIntoViewIfNeeded();
-  151 |       const scrollWidth = await page.evaluate(() => document.documentElement.scrollWidth);
-  152 |       const vp = page.viewportSize()!;
-  153 |       expect(scrollWidth).toBeLessThanOrEqual(vp.width + 5);
-  154 |     });
-  155 |   }
-  156 | });
-  157 | 
 ```

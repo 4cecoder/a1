@@ -22,13 +22,13 @@ Timeout:  5000ms
 Call log:
   - Expect "toBeVisible" with timeout 5000ms
   - waiting for locator('a[href=\'tel:8037832993\']').first()
-    14 × locator resolved to <a href="tel:8037832993" class="font-sans font-bold text-xs tracking-[0.15em] uppercase flex items-center gap-2 px-5 py-2 no-underline transition-colors">…</a>
+    14 × locator resolved to <a href="tel:8037832993">…</a>
        - unexpected value "hidden"
 
 ```
 
 ```yaml
-- navigation:
+- banner:
   - link "A1 CUTS":
     - /url: "#hero"
   - button
@@ -39,7 +39,7 @@ Call log:
   - /url: tel:8037832993
 - link "VIEW SERVICES":
   - /url: "#services"
-- text: 10+ Years Open 3 Barbers 5★ Rated What We Do
+- text: 10+ Years Open 3 Expert Barbers 5★ Rated What We Do
 - heading "Services" [level=2]
 - heading "Classic Cut" [level=3]
 - paragraph: Clean, sharp, timeless.
@@ -84,9 +84,7 @@ Call log:
 - paragraph: Walk-ins welcome. Appointments recommended.
 - link "(803) 783-2993":
   - /url: tel:8037832993
-- contentinfo:
-  - text: A1 CUTS
-  - paragraph: © 2025 A1 Cuts · Columbia, SC
+- contentinfo: A1 CUTS © 2025 A1 Cuts · Columbia, SC
 - alert
 ```
 

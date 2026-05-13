@@ -1,31 +1,40 @@
 @import "tailwindcss";
-@import "tw-animate-css";
 
-@custom-variant dark (&:is(.dark *));
-
+/* ── Design tokens ─────────────────────────────────── */
 :root {
-  --background: #0a0a0a;
-  --foreground: #f0f0f0;
-  --gold: #C9A84C;
-  --gold-muted: #a8863a;
-  --red-dark: #8B0000;
-  --card: #111111;
-  --card-border: #222222;
-  --muted: #888888;
-  --radius: 0.25rem;
+  --gold:    #C9A84C;
+  --gold-dk: #a8863a;
+  --bg0:     #080808;   /* page base */
+  --bg1:     #0f0f0f;   /* section alt */
+  --bg2:     #151515;   /* card */
+  --line:    #1e1e1e;   /* border */
+  --t1:      #f0f0f0;   /* primary text */
+  --t2:      #888888;   /* secondary */
+  --t3:      #444444;   /* muted */
 }
 
-* { box-sizing: border-box; margin: 0; padding: 0; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }
-body { background-color: var(--background); color: var(--foreground); font-family: 'Georgia', serif; }
+body { background: var(--bg0); color: var(--t1); font-family: system-ui, sans-serif; }
 
-.pole-stripe {
-  width: 4px;
+/* ── Shared layout ─────────────────────────────────── */
+.wrap {
+  width: 100%;
+  max-width: 1080px;
+  margin-inline: auto;
+  padding-inline: 24px;
+}
+
+/* ── Barber pole ───────────────────────────────────── */
+.pole {
+  width: 3px;
+  min-height: 100%;
   background: repeating-linear-gradient(
     180deg,
-    #fff 0px, #fff 10px,
-    var(--red-dark) 10px, var(--red-dark) 20px,
-    var(--gold) 20px, var(--gold) 30px
+    #fff     0px,  #fff     8px,
+    #8B0000  8px,  #8B0000  16px,
+    var(--gold) 16px, var(--gold) 24px
   );
   border-radius: 2px;
+  flex-shrink: 0;
 }

@@ -12,198 +12,182 @@
 # Error details
 
 ```
-Error: expect(locator).toBeVisible() failed
+Test timeout of 30000ms exceeded.
+```
 
-Locator: locator('text=BOOK NOW')
-Expected: visible
-Error: strict mode violation: locator('text=BOOK NOW') resolved to 2 elements:
-    1) <a href="tel:8037832993" class="font-sans font-bold text-xs tracking-[0.15em] uppercase flex items-center gap-2 px-5 py-2 no-underline transition-colors">…</a> aka getByText('Book Now', { exact: true })
-    2) <a href="tel:8037832993" class="font-sans font-bold text-xs tracking-[0.15em] uppercase flex items-center gap-2 no-underline">…</a> aka getByRole('link', { name: 'BOOK NOW' })
-
+```
+Error: locator.click: Test timeout of 30000ms exceeded.
 Call log:
-  - Expect "toBeVisible" with timeout 5000ms
-  - waiting for locator('text=BOOK NOW')
+  - waiting for locator('nav button')
 
 ```
 
 # Page snapshot
 
 ```yaml
-- generic [ref=e1]:
-  - navigation [ref=e2]:
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
     - generic [ref=e3]:
       - link "A1 CUTS" [ref=e4] [cursor=pointer]:
         - /url: "#hero"
         - img [ref=e6]
         - generic [ref=e12]: A1 CUTS
-      - button [active] [ref=e13] [cursor=pointer]:
+      - button [ref=e13] [cursor=pointer]:
         - img [ref=e14]
-    - generic [ref=e17]:
-      - link "Services" [ref=e18] [cursor=pointer]:
-        - /url: "#services"
-      - link "Barbers" [ref=e19] [cursor=pointer]:
-        - /url: "#barbers"
-      - link "Contact" [ref=e20] [cursor=pointer]:
-        - /url: "#contact"
-      - link "BOOK NOW" [ref=e21] [cursor=pointer]:
-        - /url: tel:8037832993
-        - img [ref=e22]
-        - text: BOOK NOW
-  - generic [ref=e25]:
-    - generic [ref=e28]:
-      - generic [ref=e29]:
-        - generic [ref=e30]: EST. 2010
-        - generic [ref=e31]: COLUMBIA, SC
-      - heading "A1 CUTS" [level=1] [ref=e32]:
+  - generic [ref=e16]:
+    - generic [ref=e19]:
+      - generic [ref=e20]:
+        - generic [ref=e21]: EST. 2010
+        - generic [ref=e22]: COLUMBIA, SC
+      - heading "A1 CUTS" [level=1] [ref=e23]:
         - text: A1
         - text: CUTS
-    - paragraph [ref=e33]: Premium cuts. Classic craft. Walk in looking good, walk out looking great.
-    - generic [ref=e34]:
-      - link "CALL TO BOOK" [ref=e35] [cursor=pointer]:
+    - paragraph [ref=e24]:
+      - text: Premium cuts. Classic craft.
+      - text: Walk in looking good, walk out looking great.
+    - generic [ref=e25]:
+      - link "CALL TO BOOK" [ref=e26] [cursor=pointer]:
         - /url: tel:8037832993
-        - img [ref=e36]
+        - img [ref=e27]
         - text: CALL TO BOOK
-      - link "VIEW SERVICES" [ref=e38] [cursor=pointer]:
+      - link "VIEW SERVICES" [ref=e29] [cursor=pointer]:
         - /url: "#services"
         - text: VIEW SERVICES
-        - img [ref=e39]
-    - generic [ref=e41]:
-      - generic [ref=e42]:
-        - generic [ref=e43]: 10+
-        - generic [ref=e44]: Years Open
+        - img [ref=e30]
+    - generic [ref=e32]:
+      - generic [ref=e33]:
+        - generic [ref=e34]: 10+
+        - generic [ref=e35]: Years Open
+      - generic [ref=e36]:
+        - generic [ref=e37]: "3"
+        - generic [ref=e38]: Expert Barbers
+      - generic [ref=e39]:
+        - generic [ref=e40]: 5★
+        - generic [ref=e41]: Rated
+  - generic [ref=e43]:
+    - generic [ref=e44]:
       - generic [ref=e45]:
-        - generic [ref=e46]: "3"
-        - generic [ref=e47]: Barbers
-      - generic [ref=e48]:
-        - generic [ref=e49]: 5★
-        - generic [ref=e50]: Rated
-  - generic [ref=e52]:
-    - generic [ref=e53]:
-      - img [ref=e54]
-      - generic [ref=e60]: What We Do
-    - heading "Services" [level=2] [ref=e61]
-    - generic [ref=e62]:
+        - img [ref=e46]
+        - generic [ref=e52]: What We Do
+      - heading "Services" [level=2] [ref=e53]
+    - generic [ref=e54]:
+      - generic [ref=e55]:
+        - heading "Classic Cut" [level=3] [ref=e57]
+        - paragraph [ref=e58]: Clean, sharp, timeless.
+        - generic [ref=e59]:
+          - generic [ref=e60]: $25
+          - img [ref=e61]
       - generic [ref=e63]:
         - generic [ref=e64]:
-          - heading "Classic Cut" [level=3] [ref=e66]
-          - paragraph [ref=e67]: Clean, sharp, timeless.
+          - heading "Fade" [level=3] [ref=e65]
+          - generic [ref=e66]: POPULAR
+        - paragraph [ref=e67]: Low, mid, or high — dialed in.
         - generic [ref=e68]:
-          - generic [ref=e69]: $25
+          - generic [ref=e69]: $30
           - img [ref=e70]
       - generic [ref=e72]:
-        - generic [ref=e73]:
-          - generic [ref=e74]:
-            - heading "Fade" [level=3] [ref=e75]
-            - generic [ref=e76]: POPULAR
-          - paragraph [ref=e77]: Low, mid, or high — dialed in.
-        - generic [ref=e78]:
-          - generic [ref=e79]: $30
-          - img [ref=e80]
-      - generic [ref=e82]:
-        - generic [ref=e83]:
-          - heading "Beard Trim" [level=3] [ref=e85]
-          - paragraph [ref=e86]: Lined up and looking right.
-        - generic [ref=e87]:
-          - generic [ref=e88]: $15
-          - img [ref=e89]
-      - generic [ref=e91]:
-        - generic [ref=e92]:
-          - generic [ref=e93]:
-            - heading "Cut + Beard" [level=3] [ref=e94]
-            - generic [ref=e95]: POPULAR
-          - paragraph [ref=e96]: The full treatment.
-        - generic [ref=e97]:
-          - generic [ref=e98]: $40
-          - img [ref=e99]
-      - generic [ref=e101]:
-        - generic [ref=e102]:
-          - heading "Hot Towel Shave" [level=3] [ref=e104]
-          - paragraph [ref=e105]: Old school. The real deal.
-        - generic [ref=e106]:
-          - generic [ref=e107]: $35
-          - img [ref=e108]
-      - generic [ref=e110]:
-        - generic [ref=e111]:
-          - heading "Kid's Cut" [level=3] [ref=e113]
-          - paragraph [ref=e114]: Ages 12 and under.
-        - generic [ref=e115]:
-          - generic [ref=e116]: $18
-          - img [ref=e117]
-  - generic [ref=e120]:
-    - generic [ref=e121]:
-      - img [ref=e122]
-      - generic [ref=e125]: The Team
-    - heading "Your Barbers" [level=2] [ref=e126]
-    - generic [ref=e127]:
+        - heading "Beard Trim" [level=3] [ref=e74]
+        - paragraph [ref=e75]: Lined up and looking right.
+        - generic [ref=e76]:
+          - generic [ref=e77]: $15
+          - img [ref=e78]
+      - generic [ref=e80]:
+        - generic [ref=e81]:
+          - heading "Cut + Beard" [level=3] [ref=e82]
+          - generic [ref=e83]: POPULAR
+        - paragraph [ref=e84]: The full treatment.
+        - generic [ref=e85]:
+          - generic [ref=e86]: $40
+          - img [ref=e87]
+      - generic [ref=e89]:
+        - heading "Hot Towel Shave" [level=3] [ref=e91]
+        - paragraph [ref=e92]: Old school. The real deal.
+        - generic [ref=e93]:
+          - generic [ref=e94]: $35
+          - img [ref=e95]
+      - generic [ref=e97]:
+        - heading "Kid's Cut" [level=3] [ref=e99]
+        - paragraph [ref=e100]: Ages 12 and under.
+        - generic [ref=e101]:
+          - generic [ref=e102]: $18
+          - img [ref=e103]
+  - generic [ref=e106]:
+    - generic [ref=e107]:
+      - generic [ref=e108]:
+        - img [ref=e109]
+        - generic [ref=e112]: The Team
+      - heading "Your Barbers" [level=2] [ref=e113]
+    - generic [ref=e114]:
+      - generic [ref=e115]:
+        - img [ref=e117]
+        - heading "Marcus" [level=3] [ref=e123]
+        - paragraph [ref=e124]: Master Barber
+        - paragraph [ref=e126]: Fades & Tapers
+        - paragraph [ref=e127]: 12 yrs experience
       - generic [ref=e128]:
         - img [ref=e130]
-        - heading "Marcus" [level=3] [ref=e136]
-        - paragraph [ref=e137]: Master Barber
-        - paragraph [ref=e139]: Fades & Tapers
-        - paragraph [ref=e140]: 12 yrs experience
+        - heading "DeShawn" [level=3] [ref=e136]
+        - paragraph [ref=e137]: Senior Barber
+        - paragraph [ref=e139]: Beards & Lineups
+        - paragraph [ref=e140]: 8 yrs experience
       - generic [ref=e141]:
         - img [ref=e143]
-        - heading "DeShawn" [level=3] [ref=e149]
-        - paragraph [ref=e150]: Senior Barber
-        - paragraph [ref=e152]: Beards & Lineups
-        - paragraph [ref=e153]: 8 yrs experience
-      - generic [ref=e154]:
-        - img [ref=e156]
-        - heading "Ray" [level=3] [ref=e162]
-        - paragraph [ref=e163]: Barber
-        - paragraph [ref=e165]: Classic Cuts
-        - paragraph [ref=e166]: 4 yrs experience
-  - generic [ref=e168]:
-    - generic [ref=e169]:
-      - img [ref=e170]
-      - generic [ref=e173]: Find Us
-    - heading "Contact & Hours" [level=2] [ref=e174]
-    - generic [ref=e175]:
-      - generic [ref=e176]:
-        - generic [ref=e177]:
-          - img [ref=e178]
-          - generic [ref=e181]: Location
-        - paragraph [ref=e182]:
+        - heading "Ray" [level=3] [ref=e149]
+        - paragraph [ref=e150]: Barber
+        - paragraph [ref=e152]: Classic Cuts
+        - paragraph [ref=e153]: 4 yrs experience
+  - generic [ref=e155]:
+    - generic [ref=e156]:
+      - generic [ref=e157]:
+        - img [ref=e158]
+        - generic [ref=e161]: Find Us
+      - heading "Contact & Hours" [level=2] [ref=e162]
+    - generic [ref=e163]:
+      - generic [ref=e164]:
+        - generic [ref=e165]:
+          - img [ref=e166]
+          - generic [ref=e169]: Location
+        - paragraph [ref=e171]:
           - text: "1314 Leesburg Rd #D"
           - text: Columbia, SC 29209
-        - link "Get Directions" [ref=e183] [cursor=pointer]:
+        - link "Get Directions" [ref=e172] [cursor=pointer]:
           - /url: https://maps.google.com/?q=1314+Leesburg+Rd+%23D+Columbia+SC+29209
           - text: Get Directions
-          - img [ref=e184]
-      - generic [ref=e186]:
-        - generic [ref=e187]:
-          - img [ref=e188]
-          - generic [ref=e191]: Hours
-        - generic [ref=e192]:
-          - generic [ref=e193]:
-            - generic [ref=e194]: Mon – Fri
-            - generic [ref=e195]: 9AM – 7PM
-          - generic [ref=e196]:
-            - generic [ref=e197]: Saturday
-            - generic [ref=e198]: 9AM – 6PM
-          - generic [ref=e199]:
-            - generic [ref=e200]: Sunday
-            - generic [ref=e201]: Closed
-      - generic [ref=e202]:
-        - generic [ref=e203]:
-          - img [ref=e204]
-          - generic [ref=e206]: Book
-        - paragraph [ref=e207]:
+          - img [ref=e173]
+      - generic [ref=e175]:
+        - generic [ref=e176]:
+          - img [ref=e177]
+          - generic [ref=e180]: Hours
+        - generic [ref=e182]:
+          - generic [ref=e183]:
+            - generic [ref=e184]: Mon – Fri
+            - generic [ref=e185]: 9AM – 7PM
+          - generic [ref=e186]:
+            - generic [ref=e187]: Saturday
+            - generic [ref=e188]: 9AM – 6PM
+          - generic [ref=e189]:
+            - generic [ref=e190]: Sunday
+            - generic [ref=e191]: Closed
+      - generic [ref=e192]:
+        - generic [ref=e193]:
+          - img [ref=e194]
+          - generic [ref=e196]: Book
+        - paragraph [ref=e198]:
           - text: Walk-ins welcome.
           - text: Appointments recommended.
-        - link "(803) 783-2993" [ref=e208] [cursor=pointer]:
+        - link "(803) 783-2993" [ref=e199] [cursor=pointer]:
           - /url: tel:8037832993
-          - img [ref=e209]
+          - img [ref=e200]
           - text: (803) 783-2993
-  - contentinfo [ref=e211]:
-    - generic [ref=e212]:
-      - generic [ref=e213]:
-        - img [ref=e215]
-        - generic [ref=e221]: A1 CUTS
-      - paragraph [ref=e222]: © 2025 A1 Cuts · Columbia, SC
-  - button "Open Next.js Dev Tools" [ref=e228] [cursor=pointer]:
-    - img [ref=e229]
-  - alert [ref=e232]
+  - contentinfo [ref=e202]:
+    - generic [ref=e203]:
+      - generic [ref=e204]:
+        - img [ref=e206]
+        - generic [ref=e212]: A1 CUTS
+      - generic [ref=e213]: © 2025 A1 Cuts · Columbia, SC
+  - button "Open Next.js Dev Tools" [ref=e219] [cursor=pointer]:
+    - img [ref=e220]
+  - alert [ref=e223]
 ```
 
 # Test source
@@ -255,9 +239,9 @@ Call log:
   44  |   test("hamburger opens mobile menu", async ({ page }) => {
   45  |     const vp = page.viewportSize()!;
   46  |     if (vp.width < 768) {
-  47  |       await page.locator("nav button").click();
-> 48  |       await expect(page.locator("text=BOOK NOW")).toBeVisible();
-      |                                                   ^ Error: expect(locator).toBeVisible() failed
+> 47  |       await page.locator("nav button").click();
+      |                                        ^ Error: locator.click: Test timeout of 30000ms exceeded.
+  48  |       await expect(page.locator("text=BOOK NOW")).toBeVisible();
   49  |     }
   50  |   });
   51  | });
@@ -357,5 +341,4 @@ Call log:
   145 |   const sections = ["#hero", "#services", "#barbers", "#contact"];
   146 | 
   147 |   for (const section of sections) {
-  148 |     test(`no overflow at ${section}`, async ({ page }) => {
 ```

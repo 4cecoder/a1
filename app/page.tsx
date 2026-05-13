@@ -1,122 +1,164 @@
 "use client";
 import Navbar from "./components/Navbar";
-import {
-  Scissors, MapPin, Phone, Clock, Star,
-  ChevronRight, User
-} from "lucide-react";
+import { Scissors, MapPin, Phone, Clock, Star, ChevronRight, User } from "lucide-react";
 
+/* ─── Data ─────────────────────────────────────────── */
 const SERVICES = [
-  { name: "Classic Cut", price: "$25", desc: "Clean, sharp, timeless.", popular: false },
-  { name: "Fade", price: "$30", desc: "Low, mid, or high — dialed in.", popular: true },
-  { name: "Beard Trim", price: "$15", desc: "Lined up and looking right.", popular: false },
-  { name: "Cut + Beard", price: "$40", desc: "The full treatment.", popular: true },
-  { name: "Hot Towel Shave", price: "$35", desc: "Old school. The real deal.", popular: false },
-  { name: "Kid's Cut", price: "$18", desc: "Ages 12 and under.", popular: false },
+  { name: "Classic Cut",     price: "$25", desc: "Clean, sharp, timeless.",         popular: false },
+  { name: "Fade",            price: "$30", desc: "Low, mid, or high — dialed in.",   popular: true  },
+  { name: "Beard Trim",      price: "$15", desc: "Lined up and looking right.",      popular: false },
+  { name: "Cut + Beard",     price: "$40", desc: "The full treatment.",              popular: true  },
+  { name: "Hot Towel Shave", price: "$35", desc: "Old school. The real deal.",       popular: false },
+  { name: "Kid's Cut",       price: "$18", desc: "Ages 12 and under.",               popular: false },
 ];
 
 const BARBERS = [
-  { name: "Marcus", title: "Master Barber", years: "12 yrs", specialty: "Fades & Tapers" },
-  { name: "DeShawn", title: "Senior Barber", years: "8 yrs", specialty: "Beards & Lineups" },
-  { name: "Ray", title: "Barber", years: "4 yrs", specialty: "Classic Cuts" },
+  { name: "Marcus",  role: "Master Barber",  exp: "12 yrs", spec: "Fades & Tapers"   },
+  { name: "DeShawn", role: "Senior Barber",  exp: "8 yrs",  spec: "Beards & Lineups" },
+  { name: "Ray",     role: "Barber",         exp: "4 yrs",  spec: "Classic Cuts"     },
 ];
 
 const HOURS = [
   ["Mon – Fri", "9AM – 7PM"],
-  ["Saturday", "9AM – 6PM"],
-  ["Sunday", "Closed"],
+  ["Saturday",  "9AM – 6PM"],
+  ["Sunday",    "Closed"   ],
 ];
 
-const gold = "#C9A84C";
-const goldDim = "#a8863a";
+/* ─── Tiny helpers ─────────────────────────────────── */
+const G = "var(--gold)";
+const LINE = "1px solid var(--line)";
 
+function Label({ icon: Icon, text }: { icon: React.ElementType; text: string }) {
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+      <Icon size={13} style={{ color: G }} />
+      <span style={{ fontSize: 10, letterSpacing: "0.25em", textTransform: "uppercase", color: G, fontFamily: "system-ui,sans-serif" }}>
+        {text}
+      </span>
+    </div>
+  );
+}
+
+function SectionHead({ label, icon, title }: { label: string; icon: React.ElementType; title: string }) {
+  return (
+    <div style={{ marginBottom: 40 }}>
+      <Label icon={icon} text={label} />
+      <h2 style={{ fontFamily: "Georgia,serif", fontSize: "clamp(26px,4vw,38px)", fontWeight: 700, color: "var(--t1)", lineHeight: 1.1 }}>
+        {title}
+      </h2>
+    </div>
+  );
+}
+
+/* ─── Page ─────────────────────────────────────────── */
 export default function Home() {
   return (
     <>
       <Navbar />
 
-      {/* HERO */}
-      <section id="hero" className="min-h-screen flex items-center pt-16"
-        style={{ background: "linear-gradient(135deg, #0a0a0a 55%, #150000 100%)" }}>
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-16 sm:py-24 w-full">
+      {/* ══ HERO ══════════════════════════════════════ */}
+      <section id="hero" style={{
+        minHeight: "100svh", display: "flex", alignItems: "center", paddingTop: 64,
+        background: "linear-gradient(160deg, var(--bg0) 60%, #130000 100%)"
+      }}>
+        <div className="wrap" style={{ paddingBlock: "80px 72px" }}>
 
-          <div className="flex items-start gap-4 mb-8">
-            <div className="pole-stripe h-20 sm:h-28 mt-1 shrink-0" />
+          {/* Headline block */}
+          <div style={{ display: "flex", alignItems: "flex-start", gap: 20, marginBottom: 28 }}>
+            <div className="pole" style={{ height: 100 }} />
             <div>
-              {/* Labels */}
-              <div className="flex flex-wrap gap-2 mb-4">
-                {["EST. 2010", "COLUMBIA, SC"].map(t => (
-                  <span key={t} className="font-sans text-[10px] tracking-[0.2em] px-2 py-1 border"
-                    style={{ borderColor: t === "EST. 2010" ? `${gold}44` : "#2a2a2a", color: t === "EST. 2010" ? gold : "#555" }}>
-                    {t}
-                  </span>
+              {/* Chips */}
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 16 }}>
+                {["EST. 2010", "COLUMBIA, SC"].map((t, i) => (
+                  <span key={t} style={{
+                    fontSize: 10, letterSpacing: "0.2em", padding: "4px 10px",
+                    border: `1px solid ${i === 0 ? "rgba(201,168,76,.35)" : "var(--line)"}`,
+                    color: i === 0 ? G : "var(--t3)", fontFamily: "system-ui,sans-serif"
+                  }}>{t}</span>
                 ))}
               </div>
-              {/* Headline */}
-              <h1 style={{ fontFamily: "Georgia, serif", fontSize: "clamp(48px,12vw,104px)", lineHeight: 1, color: "#fff", fontWeight: "bold" }}>
-                A1<br /><span style={{ color: gold }}>CUTS</span>
+              {/* Big type */}
+              <h1 style={{
+                fontFamily: "Georgia,serif", lineHeight: 0.92, fontWeight: 700,
+                fontSize: "clamp(56px,13vw,112px)", color: "var(--t1)"
+              }}>
+                A1<br /><span style={{ color: G }}>CUTS</span>
               </h1>
             </div>
           </div>
 
-          <p className="font-sans text-base sm:text-lg leading-relaxed mb-8 max-w-md" style={{ color: "#777" }}>
-            Premium cuts. Classic craft. Walk in looking good, walk out looking great.
+          {/* Subline */}
+          <p style={{ fontSize: 16, color: "var(--t2)", maxWidth: 420, lineHeight: 1.7, marginBottom: 36 }}>
+            Premium cuts. Classic craft.<br />Walk in looking good, walk out looking great.
           </p>
 
           {/* CTAs */}
-          <div className="flex flex-col sm:flex-row gap-3">
-            <a href="tel:8037832993" className="font-sans font-bold text-xs tracking-[0.2em] uppercase flex items-center justify-center gap-2 px-8 py-4 transition-colors no-underline"
-              style={{ background: gold, color: "#0a0a0a" }}
-              onMouseEnter={e => (e.currentTarget.style.background = goldDim)}
-              onMouseLeave={e => (e.currentTarget.style.background = gold)}>
-              <Phone size={14} /> CALL TO BOOK
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 12, marginBottom: 56 }}>
+            <a href="tel:8037832993" style={{
+              display: "inline-flex", alignItems: "center", gap: 8,
+              padding: "13px 28px", background: G, color: "#080808",
+              fontSize: 11, fontWeight: 700, letterSpacing: "0.2em", textTransform: "uppercase",
+              textDecoration: "none", fontFamily: "system-ui,sans-serif"
+            }}>
+              <Phone size={13} /> CALL TO BOOK
             </a>
-            <a href="#services" className="font-sans text-xs tracking-[0.2em] uppercase flex items-center justify-center gap-2 px-8 py-4 border transition-colors no-underline"
-              style={{ borderColor: "#2a2a2a", color: "#777" }}>
+            <a href="#services" style={{
+              display: "inline-flex", alignItems: "center", gap: 8,
+              padding: "13px 28px", border: LINE,
+              color: "var(--t2)", fontSize: 11, letterSpacing: "0.2em", textTransform: "uppercase",
+              textDecoration: "none", fontFamily: "system-ui,sans-serif"
+            }}>
               VIEW SERVICES <ChevronRight size={13} />
             </a>
           </div>
 
           {/* Stats */}
-          <div className="flex flex-wrap gap-8 sm:gap-14 mt-12 pt-10 border-t" style={{ borderColor: "#1a1a1a" }}>
-            {[["10+", "Years Open"], ["3", "Barbers"], ["5★", "Rated"]].map(([val, label]) => (
-              <div key={label}>
-                <div style={{ fontFamily: "Georgia, serif", fontSize: 22, color: gold, fontWeight: "bold" }}>{val}</div>
-                <div className="font-sans text-[10px] tracking-[0.15em] uppercase mt-1" style={{ color: "#444" }}>{label}</div>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "12px 40px", paddingTop: 28, borderTop: LINE }}>
+            {[["10+","Years Open"], ["3","Expert Barbers"], ["5★","Rated"]].map(([n, l]) => (
+              <div key={l}>
+                <div style={{ fontFamily: "Georgia,serif", fontSize: 24, fontWeight: 700, color: G }}>{n}</div>
+                <div style={{ fontSize: 10, letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--t3)", marginTop: 3 }}>{l}</div>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* SERVICES */}
-      <section id="services" style={{ background: "#0d0d0d", borderTop: "1px solid #1a1a1a", borderBottom: "1px solid #1a1a1a" }}>
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-16 sm:py-24">
-          <div className="flex items-center gap-2 mb-2">
-            <Scissors size={13} style={{ color: gold }} />
-            <span className="font-sans text-[10px] tracking-[0.25em] uppercase" style={{ color: gold }}>What We Do</span>
-          </div>
-          <h2 style={{ fontFamily: "Georgia, serif", fontSize: "clamp(28px,5vw,40px)", color: "#fff", fontWeight: "bold", marginBottom: 40 }}>Services</h2>
+      {/* ══ SERVICES ══════════════════════════════════ */}
+      <section id="services" style={{ background: "var(--bg1)", borderTop: LINE, borderBottom: LINE }}>
+        <div className="wrap" style={{ paddingBlock: "80px" }}>
+          <SectionHead label="What We Do" icon={Scissors} title="Services" />
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3" style={{ border: "1px solid #1a1a1a", gap: 1, background: "#1a1a1a" }}>
+          <div style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
+            gap: 1, background: "var(--line)"
+          }}>
             {SERVICES.map(s => (
-              <div key={s.name} className="group transition-colors p-5 sm:p-7 flex flex-col justify-between" style={{ background: "#0d0d0d", minHeight: 140 }}>
-                <div>
-                  <div className="flex items-start justify-between gap-2 mb-2">
-                    <h3 className="font-sans font-semibold text-base transition-colors"
-                      style={{ color: "#e8e8e8" }}>
-                      {s.name}
-                    </h3>
-                    {s.popular && (
-                      <span className="font-sans text-[9px] tracking-[0.15em] uppercase px-2 py-0.5 shrink-0" style={{ color: gold, border: `1px solid ${gold}44`, background: `${gold}11` }}>
-                        POPULAR
-                      </span>
-                    )}
-                  </div>
-                  <p className="font-sans text-sm" style={{ color: "#555" }}>{s.desc}</p>
+              <div key={s.name} style={{
+                background: "var(--bg1)", padding: "28px 24px",
+                display: "flex", flexDirection: "column", gap: 12
+              }}>
+                {/* Top row */}
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8 }}>
+                  <h3 style={{ fontFamily: "Georgia,serif", fontSize: 17, fontWeight: 600, color: "var(--t1)" }}>
+                    {s.name}
+                  </h3>
+                  {s.popular && (
+                    <span style={{
+                      fontSize: 9, letterSpacing: "0.15em", textTransform: "uppercase",
+                      padding: "3px 8px", border: `1px solid rgba(201,168,76,.3)`,
+                      color: G, background: "rgba(201,168,76,.07)", flexShrink: 0,
+                      fontFamily: "system-ui,sans-serif"
+                    }}>POPULAR</span>
+                  )}
                 </div>
-                <div className="flex items-center justify-between mt-4 pt-4" style={{ borderTop: "1px solid #1a1a1a" }}>
-                  <span style={{ fontFamily: "Georgia, serif", fontSize: 22, color: gold }}>{s.price}</span>
-                  <Star size={12} style={{ color: "#2a2a2a" }} />
+                {/* Desc */}
+                <p style={{ fontSize: 13, color: "var(--t3)", lineHeight: 1.6 }}>{s.desc}</p>
+                {/* Price row */}
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingTop: 12, borderTop: LINE, marginTop: "auto" }}>
+                  <span style={{ fontFamily: "Georgia,serif", fontSize: 22, color: G }}>{s.price}</span>
+                  <Star size={11} style={{ color: "var(--line)" }} />
                 </div>
               </div>
             ))}
@@ -124,106 +166,108 @@ export default function Home() {
         </div>
       </section>
 
-      {/* BARBERS */}
-      <section id="barbers" style={{ background: "#0a0a0a" }}>
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-16 sm:py-24">
-          <div className="flex items-center gap-2 mb-2">
-            <User size={13} style={{ color: gold }} />
-            <span className="font-sans text-[10px] tracking-[0.25em] uppercase" style={{ color: gold }}>The Team</span>
-          </div>
-          <h2 style={{ fontFamily: "Georgia, serif", fontSize: "clamp(28px,5vw,40px)", color: "#fff", fontWeight: "bold", marginBottom: 40 }}>Your Barbers</h2>
+      {/* ══ BARBERS ═══════════════════════════════════ */}
+      <section id="barbers" style={{ background: "var(--bg0)", borderBottom: LINE }}>
+        <div className="wrap" style={{ paddingBlock: "80px" }}>
+          <SectionHead label="The Team" icon={User} title="Your Barbers" />
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+          <div style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))",
+            gap: 16
+          }}>
             {BARBERS.map(b => (
-              <div key={b.name} className="text-center p-6 sm:p-8" style={{ background: "#111", border: "1px solid #1e1e1e" }}>
-                <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full mx-auto mb-5 flex items-center justify-center"
-                  style={{ background: "#1a1a1a", border: `2px solid ${gold}44` }}>
-                  <Scissors size={18} style={{ color: gold }} />
+              <div key={b.name} style={{
+                background: "var(--bg2)", border: LINE,
+                padding: "36px 24px", textAlign: "center"
+              }}>
+                <div style={{
+                  width: 56, height: 56, borderRadius: "50%",
+                  background: "var(--bg1)", border: `1px solid rgba(201,168,76,.3)`,
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  margin: "0 auto 20px"
+                }}>
+                  <Scissors size={18} style={{ color: G }} />
                 </div>
-                <h3 style={{ fontFamily: "Georgia, serif", fontSize: 20, color: "#fff", fontWeight: "bold", marginBottom: 4 }}>{b.name}</h3>
-                <p className="font-sans text-[10px] tracking-[0.2em] uppercase mb-4" style={{ color: gold }}>{b.title}</p>
-                <div style={{ height: 1, background: "#1e1e1e", marginBottom: 12 }} />
-                <p className="font-sans text-xs" style={{ color: "#555" }}>{b.specialty}</p>
-                <p className="font-sans text-xs mt-1" style={{ color: "#333" }}>{b.years} experience</p>
+                <h3 style={{ fontFamily: "Georgia,serif", fontSize: 20, fontWeight: 700, color: "var(--t1)", marginBottom: 4 }}>{b.name}</h3>
+                <p style={{ fontSize: 10, letterSpacing: "0.2em", textTransform: "uppercase", color: G, marginBottom: 16 }}>{b.role}</p>
+                <div style={{ height: 1, background: "var(--line)", marginBottom: 14 }} />
+                <p style={{ fontSize: 12, color: "var(--t2)" }}>{b.spec}</p>
+                <p style={{ fontSize: 11, color: "var(--t3)", marginTop: 4 }}>{b.exp} experience</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* CONTACT */}
-      <section id="contact" style={{ background: "#0d0d0d", borderTop: "1px solid #1a1a1a" }}>
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-16 sm:py-24">
-          <div className="flex items-center gap-2 mb-2">
-            <MapPin size={13} style={{ color: gold }} />
-            <span className="font-sans text-[10px] tracking-[0.25em] uppercase" style={{ color: gold }}>Find Us</span>
-          </div>
-          <h2 style={{ fontFamily: "Georgia, serif", fontSize: "clamp(28px,5vw,40px)", color: "#fff", fontWeight: "bold", marginBottom: 40 }}>Contact & Hours</h2>
+      {/* ══ CONTACT ═══════════════════════════════════ */}
+      <section id="contact" style={{ background: "var(--bg1)" }}>
+        <div className="wrap" style={{ paddingBlock: "80px" }}>
+          <SectionHead label="Find Us" icon={MapPin} title="Contact & Hours" />
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-
+          <div style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
+            gap: 16
+          }}>
             {/* Location */}
-            <div className="p-5 sm:p-7" style={{ background: "#111", border: "1px solid #1e1e1e" }}>
-              <div className="flex items-center gap-2 mb-4">
-                <MapPin size={13} style={{ color: gold }} />
-                <span className="font-sans text-[10px] tracking-[0.2em] uppercase" style={{ color: gold }}>Location</span>
-              </div>
-              <p style={{ fontFamily: "Georgia, serif", color: "#e8e8e8", lineHeight: 1.7, marginBottom: 12 }}>
+            <div style={{ background: "var(--bg2)", border: LINE, padding: "28px 24px" }}>
+              <Label icon={MapPin} text="Location" />
+              <div style={{ height: 1, background: "var(--line)", marginBottom: 20 }} />
+              <p style={{ fontFamily: "Georgia,serif", fontSize: 16, color: "var(--t1)", lineHeight: 1.7, marginBottom: 16 }}>
                 1314 Leesburg Rd #D<br />Columbia, SC 29209
               </p>
               <a href="https://maps.google.com/?q=1314+Leesburg+Rd+%23D+Columbia+SC+29209"
                 target="_blank" rel="noopener noreferrer"
-                className="font-sans text-xs flex items-center gap-1 no-underline transition-colors"
-                style={{ color: "#555" }}>
+                style={{ fontSize: 11, color: "var(--t3)", textDecoration: "none", letterSpacing: "0.1em",
+                  display: "inline-flex", alignItems: "center", gap: 4 }}>
                 Get Directions <ChevronRight size={11} />
               </a>
             </div>
 
             {/* Hours */}
-            <div className="p-5 sm:p-7" style={{ background: "#111", border: "1px solid #1e1e1e" }}>
-              <div className="flex items-center gap-2 mb-4">
-                <Clock size={13} style={{ color: gold }} />
-                <span className="font-sans text-[10px] tracking-[0.2em] uppercase" style={{ color: gold }}>Hours</span>
-              </div>
-              <div className="flex flex-col gap-3">
+            <div style={{ background: "var(--bg2)", border: LINE, padding: "28px 24px" }}>
+              <Label icon={Clock} text="Hours" />
+              <div style={{ height: 1, background: "var(--line)", marginBottom: 20 }} />
+              <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
                 {HOURS.map(([day, hrs]) => (
-                  <div key={day} className="flex justify-between items-center">
-                    <span className="font-sans text-sm" style={{ color: "#666" }}>{day}</span>
-                    <span className="font-sans text-sm" style={{ color: hrs === "Closed" ? "#333" : "#e8e8e8" }}>{hrs}</span>
+                  <div key={day} style={{ display: "flex", justifyContent: "space-between" }}>
+                    <span style={{ fontSize: 13, color: "var(--t2)" }}>{day}</span>
+                    <span style={{ fontSize: 13, color: hrs === "Closed" ? "var(--t3)" : "var(--t1)" }}>{hrs}</span>
                   </div>
                 ))}
               </div>
             </div>
 
             {/* Book */}
-            <div className="p-5 sm:p-7 sm:col-span-2 lg:col-span-1" style={{ background: "#111", border: "1px solid #1e1e1e" }}>
-              <div className="flex items-center gap-2 mb-4">
-                <Phone size={13} style={{ color: gold }} />
-                <span className="font-sans text-[10px] tracking-[0.2em] uppercase" style={{ color: gold }}>Book</span>
-              </div>
-              <p className="font-sans text-sm leading-relaxed mb-6" style={{ color: "#555" }}>
+            <div style={{ background: "var(--bg2)", border: LINE, padding: "28px 24px" }}>
+              <Label icon={Phone} text="Book" />
+              <div style={{ height: 1, background: "var(--line)", marginBottom: 20 }} />
+              <p style={{ fontSize: 13, color: "var(--t3)", lineHeight: 1.7, marginBottom: 24 }}>
                 Walk-ins welcome.<br />Appointments recommended.
               </p>
-              <a href="tel:8037832993"
-                className="font-sans font-bold text-xs tracking-[0.2em] uppercase flex items-center justify-center gap-2 w-full py-4 no-underline transition-colors"
-                style={{ background: gold, color: "#0a0a0a" }}>
+              <a href="tel:8037832993" style={{
+                display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+                padding: "13px 0", background: G, color: "#080808",
+                fontSize: 11, fontWeight: 700, letterSpacing: "0.2em", textTransform: "uppercase",
+                textDecoration: "none", fontFamily: "system-ui,sans-serif", width: "100%"
+              }}>
                 <Phone size={13} /> (803) 783-2993
               </a>
             </div>
-
           </div>
         </div>
       </section>
 
-      {/* FOOTER */}
-      <footer style={{ background: "#0a0a0a", borderTop: "1px solid #141414" }}>
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-5 flex flex-col sm:flex-row items-center justify-between gap-2">
-          <div className="flex items-center gap-2">
-            <div className="pole-stripe h-5" />
-            <Scissors size={12} style={{ color: gold }} />
-            <span className="font-sans text-xs tracking-[0.2em]" style={{ color: gold }}>A1 CUTS</span>
+      {/* ══ FOOTER ════════════════════════════════════ */}
+      <footer style={{ background: "var(--bg0)", borderTop: LINE, padding: "20px 0" }}>
+        <div className="wrap" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 8 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <div className="pole" style={{ height: 18 }} />
+            <Scissors size={12} style={{ color: G }} />
+            <span style={{ fontFamily: "Georgia,serif", fontSize: 13, color: G, letterSpacing: "0.2em" }}>A1 CUTS</span>
           </div>
-          <p className="font-sans text-xs tracking-wide" style={{ color: "#2a2a2a" }}>© 2025 A1 Cuts · Columbia, SC</p>
+          <span style={{ fontSize: 11, color: "var(--t3)", letterSpacing: "0.05em" }}>© 2025 A1 Cuts · Columbia, SC</span>
         </div>
       </footer>
     </>

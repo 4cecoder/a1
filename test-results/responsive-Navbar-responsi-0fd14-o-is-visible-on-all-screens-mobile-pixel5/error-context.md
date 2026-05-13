@@ -6,27 +6,29 @@
 
 # Test info
 
-- Name: responsive.spec.ts >> Hero section >> stats row visible
-- Location: tests/e2e/responsive.spec.ts:74:7
+- Name: responsive.spec.ts >> Navbar responsiveness >> logo is visible on all screens
+- Location: tests/e2e/responsive.spec.ts:19:7
 
 # Error details
 
 ```
 Error: expect(locator).toBeVisible() failed
 
-Locator: locator('text=Expert Barbers')
+Locator:  locator('nav').first()
 Expected: visible
-Timeout: 5000ms
-Error: element(s) not found
+Received: hidden
+Timeout:  5000ms
 
 Call log:
   - Expect "toBeVisible" with timeout 5000ms
-  - waiting for locator('text=Expert Barbers')
+  - waiting for locator('nav').first()
+    14 × locator resolved to <nav class="d-nav">…</nav>
+       - unexpected value "hidden"
 
 ```
 
 ```yaml
-- navigation:
+- banner:
   - link "A1 CUTS":
     - /url: "#hero"
   - button
@@ -37,7 +39,7 @@ Call log:
   - /url: tel:8037832993
 - link "VIEW SERVICES":
   - /url: "#services"
-- text: 10+ Years Open 3 Barbers 5★ Rated What We Do
+- text: 10+ Years Open 3 Expert Barbers 5★ Rated What We Do
 - heading "Services" [level=2]
 - heading "Classic Cut" [level=3]
 - paragraph: Clean, sharp, timeless.
@@ -82,9 +84,7 @@ Call log:
 - paragraph: Walk-ins welcome. Appointments recommended.
 - link "(803) 783-2993":
   - /url: tel:8037832993
-- contentinfo:
-  - text: A1 CUTS
-  - paragraph: © 2025 A1 Cuts · Columbia, SC
+- contentinfo: A1 CUTS © 2025 A1 Cuts · Columbia, SC
 - alert
 ```
 
@@ -110,7 +110,8 @@ Call log:
   17  |   });
   18  | 
   19  |   test("logo is visible on all screens", async ({ page }) => {
-  20  |     await expect(page.locator("nav").first()).toBeVisible();
+> 20  |     await expect(page.locator("nav").first()).toBeVisible();
+      |                                               ^ Error: expect(locator).toBeVisible() failed
   21  |   });
   22  | 
   23  |   test("desktop nav links visible on wide screens", async ({ page }) => {
@@ -166,8 +167,7 @@ Call log:
   73  | 
   74  |   test("stats row visible", async ({ page }) => {
   75  |     await expect(page.locator("text=Years Open")).toBeVisible();
-> 76  |     await expect(page.locator("text=Expert Barbers")).toBeVisible();
-      |                                                       ^ Error: expect(locator).toBeVisible() failed
+  76  |     await expect(page.locator("text=Expert Barbers")).toBeVisible();
   77  |   });
   78  | });
   79  | 
@@ -212,41 +212,4 @@ Call log:
   118 |   test.beforeEach(async ({ page }) => {
   119 |     await page.goto("/");
   120 |     await page.locator("#contact").scrollIntoViewIfNeeded();
-  121 |   });
-  122 | 
-  123 |   test("correct address is displayed", async ({ page }) => {
-  124 |     await expect(page.locator("text=1314 Leesburg Rd")).toBeVisible();
-  125 |     await expect(page.locator("text=Columbia, SC 29209")).toBeVisible();
-  126 |   });
-  127 | 
-  128 |   test("correct phone number is displayed", async ({ page }) => {
-  129 |     await expect(page.locator("text=(803) 783-2993")).toBeVisible();
-  130 |   });
-  131 | 
-  132 |   test("hours are displayed", async ({ page }) => {
-  133 |     await expect(page.locator("text=Mon – Fri")).toBeVisible();
-  134 |     await expect(page.locator("text=9AM – 7PM")).toBeVisible();
-  135 |   });
-  136 | 
-  137 |   test("get directions link present", async ({ page }) => {
-  138 |     const link = page.locator("text=Get Directions");
-  139 |     await expect(link).toBeVisible();
-  140 |     await expect(link).toHaveAttribute("href", /maps\.google\.com/);
-  141 |   });
-  142 | });
-  143 | 
-  144 | test.describe("No horizontal scroll on any viewport", () => {
-  145 |   const sections = ["#hero", "#services", "#barbers", "#contact"];
-  146 | 
-  147 |   for (const section of sections) {
-  148 |     test(`no overflow at ${section}`, async ({ page }) => {
-  149 |       await page.goto("/");
-  150 |       await page.locator(section).scrollIntoViewIfNeeded();
-  151 |       const scrollWidth = await page.evaluate(() => document.documentElement.scrollWidth);
-  152 |       const vp = page.viewportSize()!;
-  153 |       expect(scrollWidth).toBeLessThanOrEqual(vp.width + 5);
-  154 |     });
-  155 |   }
-  156 | });
-  157 | 
 ```
