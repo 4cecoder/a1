@@ -267,7 +267,7 @@ export default function Home() {
             <Scissors size={12} style={{ color: G }} />
             <span style={{ fontFamily: "Georgia,serif", fontSize: 13, color: G, letterSpacing: "0.2em" }}>A1 CUTS</span>
           </div>
-          <span style={{ fontSize: 11, color: "var(--t3)", letterSpacing: "0.05em" }}>© 2025 A1 Cuts · Columbia, SC</span>
+          <span style={{ fontSize: 11, color: "var(--t3)", letterSpacing: "0.05em" }}>© {new Date().getFullYear()} A1 Cuts · Columbia, SC</span>
         </div>
       </footer>
     </>
