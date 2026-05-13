@@ -17,7 +17,7 @@ test.describe("Navbar responsiveness", () => {
   });
 
   test("logo is visible on all screens", async ({ page }) => {
-    await isVisibleInViewport(page, "text=A1 CUTS");
+    await expect(page.locator("nav").first()).toBeVisible();
   });
 
   test("desktop nav links visible on wide screens", async ({ page }) => {

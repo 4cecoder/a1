@@ -6,24 +6,22 @@
 
 # Test info
 
-- Name: responsive.spec.ts >> Hero section >> CTA button visible and clickable
-- Location: tests/e2e/responsive.spec.ts:69:7
+- Name: responsive.spec.ts >> Hero section >> stats row visible
+- Location: tests/e2e/responsive.spec.ts:74:7
 
 # Error details
 
 ```
 Error: expect(locator).toBeVisible() failed
 
-Locator:  locator('a[href=\'tel:8037832993\']').first()
+Locator: locator('text=Expert Barbers')
 Expected: visible
-Received: hidden
-Timeout:  5000ms
+Timeout: 5000ms
+Error: element(s) not found
 
 Call log:
   - Expect "toBeVisible" with timeout 5000ms
-  - waiting for locator('a[href=\'tel:8037832993\']').first()
-    14 × locator resolved to <a href="tel:8037832993" class="font-sans font-bold text-xs tracking-[0.15em] uppercase flex items-center gap-2 px-5 py-2 no-underline transition-colors">…</a>
-       - unexpected value "hidden"
+  - waiting for locator('text=Expert Barbers')
 
 ```
 
@@ -31,7 +29,14 @@ Call log:
 - navigation:
   - link "A1 CUTS":
     - /url: "#hero"
-  - button
+  - link "Services":
+    - /url: "#services"
+  - link "Barbers":
+    - /url: "#barbers"
+  - link "Contact":
+    - /url: "#contact"
+  - link "Book Now":
+    - /url: tel:8037832993
 - text: EST. 2010 COLUMBIA, SC
 - heading "A1 CUTS" [level=1]
 - paragraph: Premium cuts. Classic craft. Walk in looking good, walk out looking great.
@@ -163,13 +168,13 @@ Call log:
   68  | 
   69  |   test("CTA button visible and clickable", async ({ page }) => {
   70  |     const cta = page.locator("a[href='tel:8037832993']").first();
-> 71  |     await expect(cta).toBeVisible();
-      |                       ^ Error: expect(locator).toBeVisible() failed
+  71  |     await expect(cta).toBeVisible();
   72  |   });
   73  | 
   74  |   test("stats row visible", async ({ page }) => {
   75  |     await expect(page.locator("text=Years Open")).toBeVisible();
-  76  |     await expect(page.locator("text=Expert Barbers")).toBeVisible();
+> 76  |     await expect(page.locator("text=Expert Barbers")).toBeVisible();
+      |                                                       ^ Error: expect(locator).toBeVisible() failed
   77  |   });
   78  | });
   79  | 

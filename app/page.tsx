@@ -1,9 +1,5 @@
+"use client";
 import Navbar from "./components/Navbar";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { buttonVariants } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 import {
   Scissors, MapPin, Phone, Clock, Star,
   ChevronRight, User
@@ -30,6 +26,9 @@ const HOURS = [
   ["Sunday", "Closed"],
 ];
 
+const gold = "#C9A84C";
+const goldDim = "#a8863a";
+
 export default function Home() {
   return (
     <>
@@ -39,48 +38,50 @@ export default function Home() {
       <section id="hero" className="min-h-screen flex items-center pt-16"
         style={{ background: "linear-gradient(135deg, #0a0a0a 55%, #150000 100%)" }}>
         <div className="max-w-5xl mx-auto px-4 sm:px-6 py-16 sm:py-24 w-full">
-          <div className="flex items-start gap-4 sm:gap-5 mb-6 sm:mb-8">
-            <div className="pole-stripe h-20 sm:h-24 mt-1 shrink-0" />
-            <div className="min-w-0">
-              <div className="flex flex-wrap items-center gap-2 mb-3 sm:mb-4">
-                <Badge variant="outline" className="border-[#C9A84C]/40 text-[#C9A84C] text-[10px] tracking-[0.2em] rounded-none font-sans">
-                  EST. 2010
-                </Badge>
-                <Badge variant="outline" className="border-[#333] text-[#666] text-[10px] tracking-[0.15em] rounded-none font-sans">
-                  COLUMBIA, SC
-                </Badge>
+
+          <div className="flex items-start gap-4 mb-8">
+            <div className="pole-stripe h-20 sm:h-28 mt-1 shrink-0" />
+            <div>
+              {/* Labels */}
+              <div className="flex flex-wrap gap-2 mb-4">
+                {["EST. 2010", "COLUMBIA, SC"].map(t => (
+                  <span key={t} className="font-sans text-[10px] tracking-[0.2em] px-2 py-1 border"
+                    style={{ borderColor: t === "EST. 2010" ? `${gold}44` : "#2a2a2a", color: t === "EST. 2010" ? gold : "#555" }}>
+                    {t}
+                  </span>
+                ))}
               </div>
-              <h1 className="text-[clamp(44px,12vw,100px)] font-bold leading-none mb-4 sm:mb-6"
-                style={{ fontFamily: "Georgia, serif" }}>
-                A1<br />
-                <span style={{ color: "#C9A84C" }}>CUTS</span>
+              {/* Headline */}
+              <h1 style={{ fontFamily: "Georgia, serif", fontSize: "clamp(48px,12vw,104px)", lineHeight: 1, color: "#fff", fontWeight: "bold" }}>
+                A1<br /><span style={{ color: gold }}>CUTS</span>
               </h1>
             </div>
           </div>
 
-          <p className="text-[#666] text-base sm:text-lg max-w-md leading-relaxed font-sans mb-8 sm:mb-10">
+          <p className="font-sans text-base sm:text-lg leading-relaxed mb-8 max-w-md" style={{ color: "#777" }}>
             Premium cuts. Classic craft. Walk in looking good, walk out looking great.
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
-            <a href="tel:8037832993"
-              className={cn(buttonVariants({ size: "lg" }), "bg-[#C9A84C] hover:bg-[#a8863a] text-black font-bold tracking-[0.15em] text-xs rounded-none px-8 no-underline w-full sm:w-auto justify-center")}>
-              <Phone size={14} className="mr-2" />
-              CALL TO BOOK
+          {/* CTAs */}
+          <div className="flex flex-col sm:flex-row gap-3">
+            <a href="tel:8037832993" className="font-sans font-bold text-xs tracking-[0.2em] uppercase flex items-center justify-center gap-2 px-8 py-4 transition-colors no-underline"
+              style={{ background: gold, color: "#0a0a0a" }}
+              onMouseEnter={e => (e.currentTarget.style.background = goldDim)}
+              onMouseLeave={e => (e.currentTarget.style.background = gold)}>
+              <Phone size={14} /> CALL TO BOOK
             </a>
-            <a href="#services"
-              className={cn(buttonVariants({ variant: "outline", size: "lg" }), "border-[#333] text-[#888] hover:border-[#C9A84C] hover:text-[#C9A84C] tracking-[0.15em] text-xs rounded-none px-8 no-underline w-full sm:w-auto justify-center")}>
-              VIEW SERVICES
-              <ChevronRight size={14} className="ml-2" />
+            <a href="#services" className="font-sans text-xs tracking-[0.2em] uppercase flex items-center justify-center gap-2 px-8 py-4 border transition-colors no-underline"
+              style={{ borderColor: "#2a2a2a", color: "#777" }}>
+              VIEW SERVICES <ChevronRight size={13} />
             </a>
           </div>
 
-          {/* Stats — wrap on mobile */}
-          <div className="flex flex-wrap gap-8 sm:gap-12 mt-12 sm:mt-16 pt-8 sm:pt-10 border-t border-[#1a1a1a]">
-            {[["10+", "Years Open"], ["3", "Expert Barbers"], ["5★", "Rated"]].map(([val, label]) => (
+          {/* Stats */}
+          <div className="flex flex-wrap gap-8 sm:gap-14 mt-12 pt-10 border-t" style={{ borderColor: "#1a1a1a" }}>
+            {[["10+", "Years Open"], ["3", "Barbers"], ["5★", "Rated"]].map(([val, label]) => (
               <div key={label}>
-                <div className="text-xl sm:text-2xl font-bold text-[#C9A84C]" style={{ fontFamily: "Georgia, serif" }}>{val}</div>
-                <div className="text-[#555] text-[10px] sm:text-xs tracking-[0.15em] uppercase font-sans mt-1">{label}</div>
+                <div style={{ fontFamily: "Georgia, serif", fontSize: 22, color: gold, fontWeight: "bold" }}>{val}</div>
+                <div className="font-sans text-[10px] tracking-[0.15em] uppercase mt-1" style={{ color: "#444" }}>{label}</div>
               </div>
             ))}
           </div>
@@ -88,143 +89,141 @@ export default function Home() {
       </section>
 
       {/* SERVICES */}
-      <section id="services" className="bg-[#0f0f0f] border-y border-[#1f1f1f]">
+      <section id="services" style={{ background: "#0d0d0d", borderTop: "1px solid #1a1a1a", borderBottom: "1px solid #1a1a1a" }}>
         <div className="max-w-5xl mx-auto px-4 sm:px-6 py-16 sm:py-24">
-          <div className="flex items-center gap-3 mb-2">
-            <Scissors size={14} className="text-[#C9A84C]" />
-            <span className="text-[#C9A84C] text-[10px] tracking-[0.25em] uppercase font-sans">What We Do</span>
+          <div className="flex items-center gap-2 mb-2">
+            <Scissors size={13} style={{ color: gold }} />
+            <span className="font-sans text-[10px] tracking-[0.25em] uppercase" style={{ color: gold }}>What We Do</span>
           </div>
-          <h2 className="text-3xl sm:text-4xl font-bold mb-8 sm:mb-12" style={{ fontFamily: "Georgia, serif" }}>Services</h2>
+          <h2 style={{ fontFamily: "Georgia, serif", fontSize: "clamp(28px,5vw,40px)", color: "#fff", fontWeight: "bold", marginBottom: 40 }}>Services</h2>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-px bg-[#1f1f1f]">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3" style={{ border: "1px solid #1a1a1a", gap: 1, background: "#1a1a1a" }}>
             {SERVICES.map(s => (
-              <Card key={s.name} className="bg-[#0f0f0f] rounded-none border-0 hover:bg-[#141414] transition-colors group">
-                <CardContent className="p-5 sm:p-7">
-                  <div className="flex justify-between items-start mb-3">
-                    <h3 className="text-base sm:text-lg font-semibold text-white group-hover:text-[#C9A84C] transition-colors"
-                      style={{ fontFamily: "Georgia, serif" }}>
+              <div key={s.name} className="group transition-colors p-5 sm:p-7 flex flex-col justify-between" style={{ background: "#0d0d0d", minHeight: 140 }}>
+                <div>
+                  <div className="flex items-start justify-between gap-2 mb-2">
+                    <h3 className="font-sans font-semibold text-base transition-colors"
+                      style={{ color: "#e8e8e8" }}>
                       {s.name}
                     </h3>
                     {s.popular && (
-                      <Badge className="bg-[#C9A84C]/10 text-[#C9A84C] border-[#C9A84C]/30 text-[9px] tracking-[0.15em] rounded-none font-sans shrink-0 ml-2">
+                      <span className="font-sans text-[9px] tracking-[0.15em] uppercase px-2 py-0.5 shrink-0" style={{ color: gold, border: `1px solid ${gold}44`, background: `${gold}11` }}>
                         POPULAR
-                      </Badge>
+                      </span>
                     )}
                   </div>
-                  <p className="text-[#555] text-sm font-sans mb-4">{s.desc}</p>
-                  <div className="flex items-center justify-between">
-                    <span className="text-xl sm:text-2xl text-[#C9A84C]" style={{ fontFamily: "Georgia, serif" }}>{s.price}</span>
-                    <Star size={12} className="text-[#333] group-hover:text-[#C9A84C] transition-colors" />
-                  </div>
-                </CardContent>
-              </Card>
+                  <p className="font-sans text-sm" style={{ color: "#555" }}>{s.desc}</p>
+                </div>
+                <div className="flex items-center justify-between mt-4 pt-4" style={{ borderTop: "1px solid #1a1a1a" }}>
+                  <span style={{ fontFamily: "Georgia, serif", fontSize: 22, color: gold }}>{s.price}</span>
+                  <Star size={12} style={{ color: "#2a2a2a" }} />
+                </div>
+              </div>
             ))}
           </div>
         </div>
       </section>
 
       {/* BARBERS */}
-      <section id="barbers" className="bg-[#0a0a0a]">
+      <section id="barbers" style={{ background: "#0a0a0a" }}>
         <div className="max-w-5xl mx-auto px-4 sm:px-6 py-16 sm:py-24">
-          <div className="flex items-center gap-3 mb-2">
-            <User size={14} className="text-[#C9A84C]" />
-            <span className="text-[#C9A84C] text-[10px] tracking-[0.25em] uppercase font-sans">The Team</span>
+          <div className="flex items-center gap-2 mb-2">
+            <User size={13} style={{ color: gold }} />
+            <span className="font-sans text-[10px] tracking-[0.25em] uppercase" style={{ color: gold }}>The Team</span>
           </div>
-          <h2 className="text-3xl sm:text-4xl font-bold mb-8 sm:mb-12" style={{ fontFamily: "Georgia, serif" }}>Your Barbers</h2>
+          <h2 style={{ fontFamily: "Georgia, serif", fontSize: "clamp(28px,5vw,40px)", color: "#fff", fontWeight: "bold", marginBottom: 40 }}>Your Barbers</h2>
 
-          {/* 1 col → 2 col → 3 col */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {BARBERS.map(b => (
-              <Card key={b.name} className="bg-[#111] border-[#1f1f1f] rounded-none hover:border-[#C9A84C]/40 transition-colors group">
-                <CardContent className="p-6 sm:p-8 text-center">
-                  <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-[#1a1a1a] border-2 border-[#C9A84C]/30 group-hover:border-[#C9A84C] transition-colors mx-auto mb-4 sm:mb-5 flex items-center justify-center">
-                    <Scissors size={18} className="text-[#C9A84C]" />
-                  </div>
-                  <h3 className="text-lg sm:text-xl font-bold text-white mb-1" style={{ fontFamily: "Georgia, serif" }}>{b.name}</h3>
-                  <p className="text-[#C9A84C] text-[10px] tracking-[0.2em] uppercase font-sans mb-1">{b.title}</p>
-                  <Separator className="bg-[#1f1f1f] my-3 sm:my-4" />
-                  <p className="text-[#555] text-xs font-sans">{b.specialty}</p>
-                  <p className="text-[#333] text-xs font-sans mt-1">{b.years} experience</p>
-                </CardContent>
-              </Card>
+              <div key={b.name} className="text-center p-6 sm:p-8" style={{ background: "#111", border: "1px solid #1e1e1e" }}>
+                <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full mx-auto mb-5 flex items-center justify-center"
+                  style={{ background: "#1a1a1a", border: `2px solid ${gold}44` }}>
+                  <Scissors size={18} style={{ color: gold }} />
+                </div>
+                <h3 style={{ fontFamily: "Georgia, serif", fontSize: 20, color: "#fff", fontWeight: "bold", marginBottom: 4 }}>{b.name}</h3>
+                <p className="font-sans text-[10px] tracking-[0.2em] uppercase mb-4" style={{ color: gold }}>{b.title}</p>
+                <div style={{ height: 1, background: "#1e1e1e", marginBottom: 12 }} />
+                <p className="font-sans text-xs" style={{ color: "#555" }}>{b.specialty}</p>
+                <p className="font-sans text-xs mt-1" style={{ color: "#333" }}>{b.years} experience</p>
+              </div>
             ))}
           </div>
         </div>
       </section>
 
       {/* CONTACT */}
-      <section id="contact" className="bg-[#0f0f0f] border-t border-[#1f1f1f]">
+      <section id="contact" style={{ background: "#0d0d0d", borderTop: "1px solid #1a1a1a" }}>
         <div className="max-w-5xl mx-auto px-4 sm:px-6 py-16 sm:py-24">
-          <div className="flex items-center gap-3 mb-2">
-            <MapPin size={14} className="text-[#C9A84C]" />
-            <span className="text-[#C9A84C] text-[10px] tracking-[0.25em] uppercase font-sans">Find Us</span>
+          <div className="flex items-center gap-2 mb-2">
+            <MapPin size={13} style={{ color: gold }} />
+            <span className="font-sans text-[10px] tracking-[0.25em] uppercase" style={{ color: gold }}>Find Us</span>
           </div>
-          <h2 className="text-3xl sm:text-4xl font-bold mb-8 sm:mb-12" style={{ fontFamily: "Georgia, serif" }}>Contact & Hours</h2>
+          <h2 style={{ fontFamily: "Georgia, serif", fontSize: "clamp(28px,5vw,40px)", color: "#fff", fontWeight: "bold", marginBottom: 40 }}>Contact & Hours</h2>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-8">
-            <Card className="bg-[#111] border-[#1f1f1f] rounded-none">
-              <CardContent className="p-5 sm:p-7">
-                <div className="flex items-center gap-2 mb-4">
-                  <MapPin size={14} className="text-[#C9A84C]" />
-                  <span className="text-[#C9A84C] text-[10px] tracking-[0.2em] uppercase font-sans">Location</span>
-                </div>
-                <p className="text-white text-base leading-relaxed mb-3" style={{ fontFamily: "Georgia, serif" }}>
-                  1314 Leesburg Rd #D<br />Columbia, SC 29209
-                </p>
-                <a href="https://maps.google.com/?q=1314+Leesburg+Rd+%23D+Columbia+SC+29209"
-                  target="_blank" rel="noopener noreferrer"
-                  className="text-[#555] hover:text-[#C9A84C] text-xs font-sans tracking-wide transition-colors no-underline flex items-center gap-1">
-                  Get Directions <ChevronRight size={12} />
-                </a>
-              </CardContent>
-            </Card>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
 
-            <Card className="bg-[#111] border-[#1f1f1f] rounded-none">
-              <CardContent className="p-5 sm:p-7">
-                <div className="flex items-center gap-2 mb-4">
-                  <Clock size={14} className="text-[#C9A84C]" />
-                  <span className="text-[#C9A84C] text-[10px] tracking-[0.2em] uppercase font-sans">Hours</span>
-                </div>
-                <div className="space-y-3">
-                  {HOURS.map(([day, hours]) => (
-                    <div key={day} className="flex justify-between items-center">
-                      <span className="text-[#666] text-sm font-sans">{day}</span>
-                      <span className={`text-sm font-sans ${hours === "Closed" ? "text-[#444]" : "text-white"}`}>{hours}</span>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+            {/* Location */}
+            <div className="p-5 sm:p-7" style={{ background: "#111", border: "1px solid #1e1e1e" }}>
+              <div className="flex items-center gap-2 mb-4">
+                <MapPin size={13} style={{ color: gold }} />
+                <span className="font-sans text-[10px] tracking-[0.2em] uppercase" style={{ color: gold }}>Location</span>
+              </div>
+              <p style={{ fontFamily: "Georgia, serif", color: "#e8e8e8", lineHeight: 1.7, marginBottom: 12 }}>
+                1314 Leesburg Rd #D<br />Columbia, SC 29209
+              </p>
+              <a href="https://maps.google.com/?q=1314+Leesburg+Rd+%23D+Columbia+SC+29209"
+                target="_blank" rel="noopener noreferrer"
+                className="font-sans text-xs flex items-center gap-1 no-underline transition-colors"
+                style={{ color: "#555" }}>
+                Get Directions <ChevronRight size={11} />
+              </a>
+            </div>
 
-            <Card className="bg-[#111] border-[#1f1f1f] rounded-none sm:col-span-2 lg:col-span-1">
-              <CardContent className="p-5 sm:p-7">
-                <div className="flex items-center gap-2 mb-4">
-                  <Phone size={14} className="text-[#C9A84C]" />
-                  <span className="text-[#C9A84C] text-[10px] tracking-[0.2em] uppercase font-sans">Book</span>
-                </div>
-                <p className="text-[#555] text-sm font-sans leading-relaxed mb-6">
-                  Walk-ins welcome.<br />Appointments recommended.
-                </p>
-                <a href="tel:8037832993"
-                  className={cn(buttonVariants(), "w-full bg-[#C9A84C] hover:bg-[#a8863a] text-black font-bold tracking-[0.15em] text-xs rounded-none no-underline justify-center")}>
-                  <Phone size={13} className="mr-2" />
-                  (803) 783-2993
-                </a>
-              </CardContent>
-            </Card>
+            {/* Hours */}
+            <div className="p-5 sm:p-7" style={{ background: "#111", border: "1px solid #1e1e1e" }}>
+              <div className="flex items-center gap-2 mb-4">
+                <Clock size={13} style={{ color: gold }} />
+                <span className="font-sans text-[10px] tracking-[0.2em] uppercase" style={{ color: gold }}>Hours</span>
+              </div>
+              <div className="flex flex-col gap-3">
+                {HOURS.map(([day, hrs]) => (
+                  <div key={day} className="flex justify-between items-center">
+                    <span className="font-sans text-sm" style={{ color: "#666" }}>{day}</span>
+                    <span className="font-sans text-sm" style={{ color: hrs === "Closed" ? "#333" : "#e8e8e8" }}>{hrs}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Book */}
+            <div className="p-5 sm:p-7 sm:col-span-2 lg:col-span-1" style={{ background: "#111", border: "1px solid #1e1e1e" }}>
+              <div className="flex items-center gap-2 mb-4">
+                <Phone size={13} style={{ color: gold }} />
+                <span className="font-sans text-[10px] tracking-[0.2em] uppercase" style={{ color: gold }}>Book</span>
+              </div>
+              <p className="font-sans text-sm leading-relaxed mb-6" style={{ color: "#555" }}>
+                Walk-ins welcome.<br />Appointments recommended.
+              </p>
+              <a href="tel:8037832993"
+                className="font-sans font-bold text-xs tracking-[0.2em] uppercase flex items-center justify-center gap-2 w-full py-4 no-underline transition-colors"
+                style={{ background: gold, color: "#0a0a0a" }}>
+                <Phone size={13} /> (803) 783-2993
+              </a>
+            </div>
+
           </div>
         </div>
       </section>
 
       {/* FOOTER */}
-      <footer className="bg-[#0a0a0a] border-t border-[#1a1a1a] py-5 px-4 sm:px-6">
-        <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-3">
+      <footer style={{ background: "#0a0a0a", borderTop: "1px solid #141414" }}>
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-5 flex flex-col sm:flex-row items-center justify-between gap-2">
           <div className="flex items-center gap-2">
             <div className="pole-stripe h-5" />
-            <Scissors size={12} className="text-[#C9A84C]" />
-            <span className="text-[#C9A84C] text-xs tracking-[0.2em] font-sans">A1 CUTS</span>
+            <Scissors size={12} style={{ color: gold }} />
+            <span className="font-sans text-xs tracking-[0.2em]" style={{ color: gold }}>A1 CUTS</span>
           </div>
-          <p className="text-[#333] text-xs font-sans tracking-wide">© 2025 A1 Cuts · Columbia, SC</p>
+          <p className="font-sans text-xs tracking-wide" style={{ color: "#2a2a2a" }}>© 2025 A1 Cuts · Columbia, SC</p>
         </div>
       </footer>
     </>
