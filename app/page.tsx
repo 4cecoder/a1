@@ -166,40 +166,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ══ BARBERS ═══════════════════════════════════ */}
-      <section id="barbers" style={{ background: "var(--bg0)", borderBottom: LINE }}>
-        <div className="wrap" style={{ paddingBlock: "80px" }}>
-          <SectionHead label="The Team" icon={User} title="Your Barbers" />
-
-          <div style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))",
-            gap: 16
-          }}>
-            {BARBERS.map(b => (
-              <div key={b.name} style={{
-                background: "var(--bg2)", border: LINE,
-                padding: "36px 24px", textAlign: "center"
-              }}>
-                <div style={{
-                  width: 56, height: 56, borderRadius: "50%",
-                  background: "var(--bg1)", border: `1px solid rgba(201,168,76,.3)`,
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  margin: "0 auto 20px"
-                }}>
-                  <Scissors size={18} style={{ color: G }} />
-                </div>
-                <h3 style={{ fontFamily: "Georgia,serif", fontSize: 20, fontWeight: 700, color: "var(--t1)", marginBottom: 4 }}>{b.name}</h3>
-                <p style={{ fontSize: 10, letterSpacing: "0.2em", textTransform: "uppercase", color: G, marginBottom: 16 }}>{b.role}</p>
-                <div style={{ height: 1, background: "var(--line)", marginBottom: 14 }} />
-                <p style={{ fontSize: 12, color: "var(--t2)" }}>{b.spec}</p>
-                <p style={{ fontSize: 11, color: "var(--t3)", marginTop: 4 }}>{b.exp} experience</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* ══ CONTACT ═══════════════════════════════════ */}
       <section id="contact" style={{ background: "var(--bg1)" }}>
         <div className="wrap" style={{ paddingBlock: "80px" }}>

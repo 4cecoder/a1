@@ -24,7 +24,7 @@ export default function Navbar() {
 
         {/* Desktop links */}
         <nav style={{ display: "flex", alignItems: "center", gap: 32 }} className="d-nav">
-          {["Services", "Barbers", "Contact"].map(l => (
+          {["Services", "Contact"].map(l => (
             <a key={l} href={`#${l.toLowerCase()}`} style={{
               fontSize: 11, letterSpacing: "0.2em", textTransform: "uppercase",
               color: "var(--t2)", textDecoration: "none", fontFamily: "system-ui,sans-serif"
@@ -54,7 +54,7 @@ export default function Navbar() {
           background: "var(--bg1)", borderTop: "1px solid var(--line)",
           padding: "20px 24px", display: "flex", flexDirection: "column", gap: 18
         }}>
-          {["Services", "Barbers", "Contact"].map(l => (
+          {["Services", "Contact"].map(l => (
             <a key={l} href={`#${l.toLowerCase()}`} onClick={() => setOpen(false)} style={{
               fontSize: 11, letterSpacing: "0.2em", textTransform: "uppercase",
               color: "var(--t2)", textDecoration: "none"
