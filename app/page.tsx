@@ -127,7 +127,7 @@ A1<br />
             <div>
               <h4 style={{ fontFamily: "sans-serif", fontSize: 11, letterSpacing: 3, color: "#C9A84C", textTransform: "uppercase", marginBottom: 16 }}>Location</h4>
               <p style={{ fontFamily: "Georgia, serif", fontSize: 18, color: "#fff", lineHeight: 1.6 }}>1314 Leesburg Rd #D<br />Columbia, SC 29209</p>
-              <p style={{ fontFamily: "sans-serif", fontSize: 14, color: "#666", marginTop: 12 }}>(803) 555-0199</p>
+              <p style={{ fontFamily: "sans-serif", fontSize: 14, color: "#666", marginTop: 12 }}>(803) 783-2993</p>
             </div>
             <div>
               <h4 style={{ fontFamily: "sans-serif", fontSize: 11, letterSpacing: 3, color: "#C9A84C", textTransform: "uppercase", marginBottom: 16 }}>Hours</h4>
@@ -147,7 +147,7 @@ A1<br />
               <p style={{ fontFamily: "sans-serif", fontSize: 14, color: "#666", lineHeight: 1.7, marginBottom: 20 }}>
                 Walk-ins welcome. Appointments recommended.
               </p>
-              <a href="tel:8035550199" style={{
+              <a href="tel:8037832993" style={{
                 display: "inline-block", padding: "12px 28px",
                 background: "#C9A84C", color: "#0a0a0a",
                 textDecoration: "none", fontFamily: "sans-serif",
