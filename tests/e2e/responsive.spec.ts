@@ -137,7 +137,7 @@ test.describe("Contact section", () => {
   test("get directions link present", async ({ page }) => {
     const link = page.locator("text=Get Directions");
     await expect(link).toBeVisible();
-    await expect(link).toHaveAttribute("href", /maps\.google\.com/);
+    await expect(link).toHaveAttribute("href", /maps\.app\.goo\.gl/);
   });
 });
 

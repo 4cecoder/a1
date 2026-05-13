@@ -217,7 +217,7 @@ export default function Home() {
               <p style={{ fontFamily: "Georgia,serif", fontSize: 16, color: "var(--t1)", lineHeight: 1.7, marginBottom: 16 }}>
                 1314 Leesburg Rd #D<br />Columbia, SC 29209
               </p>
-              <a href="https://maps.google.com/?q=1314+Leesburg+Rd+%23D+Columbia+SC+29209"
+              <a href="https://maps.app.goo.gl/wB2TWPoKvvPeR5Lb9"
                 target="_blank" rel="noopener noreferrer"
                 style={{ fontSize: 11, color: "var(--t3)", textDecoration: "none", letterSpacing: "0.1em",
                   display: "inline-flex", alignItems: "center", gap: 4 }}>
