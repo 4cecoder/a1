@@ -5,12 +5,17 @@ import { Scissors, Menu, X, Phone } from "lucide-react";
 export default function Navbar() {
   const [open, setOpen] = useState(false);
 
+  const mobileDrawerId = "mobile-nav-drawer";
+
   return (
-    <header style={{
-      position: "fixed", inset: "0 0 auto 0", zIndex: 100,
-      background: "rgba(8,8,8,0.94)", borderBottom: "1px solid var(--line)",
-      backdropFilter: "blur(12px)"
-    }}>
+    <header
+      data-testid="navbar-header"
+      style={{
+        position: "fixed", inset: "0 0 auto 0", zIndex: 100,
+        background: "rgba(8,8,8,0.94)", borderBottom: "1px solid var(--line)",
+        backdropFilter: "blur(12px)"
+      }}
+    >
       <div className="wrap" style={{ height: 64, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
 
         {/* Brand */}
@@ -23,7 +28,7 @@ export default function Navbar() {
         </a>
 
         {/* Desktop links */}
-        <nav style={{ display: "flex", alignItems: "center", gap: 32 }} className="d-nav">
+        <nav data-testid="navbar-desktop-nav" style={{ display: "flex", alignItems: "center", gap: 32 }} className="d-nav">
           {["Services", "Contact"].map(l => (
             <a key={l} href={`#${l.toLowerCase()}`} style={{
               fontSize: 11, letterSpacing: "0.2em", textTransform: "uppercase",
@@ -41,19 +46,32 @@ export default function Navbar() {
         </nav>
 
         {/* Mobile toggle */}
-        <button onClick={() => setOpen(o => !o)} className="m-toggle" style={{
-          background: "none", border: "none", cursor: "pointer", color: "var(--gold)", display: "none"
-        }}>
+        <button
+          data-testid="navbar-mobile-toggle"
+          type="button"
+          aria-label={open ? "Close navigation menu" : "Open navigation menu"}
+          aria-expanded={open}
+          aria-controls={mobileDrawerId}
+          onClick={() => setOpen(o => !o)}
+          className="m-toggle"
+          style={{
+            background: "none", border: "none", cursor: "pointer", color: "var(--gold)", display: "none"
+          }}
+        >
           {open ? <X size={22} /> : <Menu size={22} />}
         </button>
       </div>
 
       {/* Mobile drawer */}
       {open && (
-        <div style={{
-          background: "var(--bg1)", borderTop: "1px solid var(--line)",
-          padding: "20px 24px", display: "flex", flexDirection: "column", gap: 18
-        }}>
+        <div
+          id={mobileDrawerId}
+          data-testid="navbar-mobile-drawer"
+          style={{
+            background: "var(--bg1)", borderTop: "1px solid var(--line)",
+            padding: "20px 24px", display: "flex", flexDirection: "column", gap: 18
+          }}
+        >
           {["Services", "Contact"].map(l => (
             <a key={l} href={`#${l.toLowerCase()}`} onClick={() => setOpen(false)} style={{
               fontSize: 11, letterSpacing: "0.2em", textTransform: "uppercase",
