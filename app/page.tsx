@@ -1,6 +1,14 @@
 "use client";
-import Navbar from "./components/Navbar";
+import { motion, useReducedMotion } from "framer-motion";
 import { Scissors, MapPin, Phone, Clock, Star, ChevronRight, User } from "lucide-react";
+import {
+  cardInteraction,
+  createRevealVariants,
+  getReducedMotionProps,
+  revealItemVariants,
+  springTransition,
+} from "../lib/motion";
+import Navbar from "./components/Navbar";
 
 /* ─── Data ─────────────────────────────────────────── */
 const SERVICES = [
@@ -52,6 +60,11 @@ function SectionHead({ label, icon, title }: { label: string; icon: React.Elemen
 
 /* ─── Page ─────────────────────────────────────────── */
 export default function Home() {
+  const reducedMotion = useReducedMotion();
+  const motionSafe = getReducedMotionProps(Boolean(reducedMotion));
+  const heroReveal = createRevealVariants(0.07, 0.05);
+  const sectionReveal = createRevealVariants(0.05, 0.02);
+
   return (
     <>
       <Navbar />
@@ -61,20 +74,34 @@ export default function Home() {
         minHeight: "100svh", display: "flex", alignItems: "center", paddingTop: 64,
         background: "linear-gradient(160deg, var(--bg0) 60%, #130000 100%)"
       }}>
-        <div className="wrap" style={{ paddingBlock: "80px 72px" }}>
-
+        <motion.div
+          className="wrap"
+          style={{ paddingBlock: "80px 72px" }}
+          variants={heroReveal}
+          initial={motionSafe.initial}
+          animate={motionSafe.animate}
+        >
           {/* Headline block */}
-          <div style={{ display: "flex", alignItems: "flex-start", gap: 20, marginBottom: 28 }}>
+          <motion.div variants={revealItemVariants} style={{ display: "flex", alignItems: "flex-start", gap: 20, marginBottom: 28 }}>
             <div className="pole" style={{ height: 100 }} />
             <div>
               {/* Chips */}
               <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 16 }}>
                 {["EST. 2010", "COLUMBIA, SC"].map((t, i) => (
-                  <span key={t} style={{
-                    fontSize: 10, letterSpacing: "0.2em", padding: "4px 10px",
-                    border: `1px solid ${i === 0 ? "rgba(201,168,76,.35)" : "var(--line)"}`,
-                    color: i === 0 ? G : "var(--t3)", fontFamily: "system-ui,sans-serif"
-                  }}>{t}</span>
+                  <motion.span
+                    key={t}
+                    variants={revealItemVariants}
+                    style={{
+                      fontSize: 10,
+                      letterSpacing: "0.2em",
+                      padding: "4px 10px",
+                      border: `1px solid ${i === 0 ? "rgba(201,168,76,.35)" : "var(--line)"}`,
+                      color: i === 0 ? G : "var(--t3)",
+                      fontFamily: "system-ui,sans-serif",
+                    }}
+                  >
+                    {t}
+                  </motion.span>
                 ))}
               </div>
               {/* Big type */}
@@ -85,60 +112,105 @@ export default function Home() {
                 A1<br /><span style={{ color: G }}>CUTS</span>
               </h1>
             </div>
-          </div>
+          </motion.div>
 
           {/* Subline */}
-          <p style={{ fontSize: 16, color: "var(--t2)", maxWidth: 420, lineHeight: 1.7, marginBottom: 36 }}>
+          <motion.p variants={revealItemVariants} style={{ fontSize: 16, color: "var(--t2)", maxWidth: 420, lineHeight: 1.7, marginBottom: 20 }}>
             Premium cuts. Classic craft.<br />Walk in looking good, walk out looking great.
-          </p>
+          </motion.p>
+
+          <motion.div variants={revealItemVariants} style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "7px 12px", border: `1px solid rgba(201,168,76,.3)`, background: "rgba(201,168,76,.08)", marginBottom: 24, maxWidth: "100%" }}>
+            <span style={{ width: 7, height: 7, borderRadius: 999, background: G, flexShrink: 0 }} />
+            <span style={{ fontSize: 10, letterSpacing: "0.14em", textTransform: "uppercase", color: G, fontFamily: "system-ui,sans-serif" }}>
+              Walk-ins welcome today
+            </span>
+          </motion.div>
 
           {/* CTAs */}
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 12, marginBottom: 56 }}>
-            <a href="tel:8037832993" style={{
-              display: "inline-flex", alignItems: "center", gap: 8,
-              padding: "13px 28px", background: G, color: "#080808",
-              fontSize: 11, fontWeight: 700, letterSpacing: "0.2em", textTransform: "uppercase",
-              textDecoration: "none", fontFamily: "system-ui,sans-serif"
-            }}>
+          <motion.div variants={revealItemVariants} style={{ display: "flex", flexWrap: "wrap", gap: 12, marginBottom: 56 }}>
+            <motion.a
+              href="tel:8037832993"
+              whileHover={!reducedMotion ? cardInteraction.whileHover : undefined}
+              whileTap={!reducedMotion ? cardInteraction.whileTap : undefined}
+              transition={springTransition}
+              style={{
+                display: "inline-flex", alignItems: "center", gap: 8,
+                padding: "13px 28px", background: G, color: "#080808",
+                fontSize: 11, fontWeight: 700, letterSpacing: "0.2em", textTransform: "uppercase",
+                textDecoration: "none", fontFamily: "system-ui,sans-serif"
+              }}
+            >
               <Phone size={13} /> CALL TO BOOK
-            </a>
-            <a href="#services" style={{
-              display: "inline-flex", alignItems: "center", gap: 8,
-              padding: "13px 28px", border: LINE,
-              color: "var(--t2)", fontSize: 11, letterSpacing: "0.2em", textTransform: "uppercase",
-              textDecoration: "none", fontFamily: "system-ui,sans-serif"
-            }}>
+            </motion.a>
+            <motion.a
+              href="#services"
+              whileHover={!reducedMotion ? cardInteraction.whileHover : undefined}
+              whileTap={!reducedMotion ? cardInteraction.whileTap : undefined}
+              transition={springTransition}
+              style={{
+                display: "inline-flex", alignItems: "center", gap: 8,
+                padding: "13px 28px", border: LINE,
+                color: "var(--t2)", fontSize: 11, letterSpacing: "0.2em", textTransform: "uppercase",
+                textDecoration: "none", fontFamily: "system-ui,sans-serif"
+              }}
+            >
               VIEW SERVICES <ChevronRight size={13} />
-            </a>
-          </div>
+            </motion.a>
+          </motion.div>
 
           {/* Stats */}
-          <div style={{ display: "flex", flexWrap: "wrap", gap: "12px 40px", paddingTop: 28, borderTop: LINE }}>
+          <motion.div variants={revealItemVariants} style={{ display: "flex", flexWrap: "wrap", gap: "12px 40px", paddingTop: 28, borderTop: LINE }}>
             {[["10+","Years Open"], ["3","Expert Barbers"], ["5★","Rated"]].map(([n, l]) => (
-              <div key={l}>
+              <motion.div key={l} variants={revealItemVariants}>
                 <div style={{ fontFamily: "Georgia,serif", fontSize: 24, fontWeight: 700, color: G }}>{n}</div>
                 <div style={{ fontSize: 10, letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--t3)", marginTop: 3 }}>{l}</div>
-              </div>
+              </motion.div>
             ))}
-          </div>
-        </div>
+          </motion.div>
+
+          <motion.p variants={revealItemVariants} style={{ fontSize: 12, color: "var(--t3)", lineHeight: 1.65, marginTop: 18, maxWidth: 520 }}>
+            Trusted by Columbia regulars for consistent cuts, clean service, and a no-rush chair experience.
+          </motion.p>
+        </motion.div>
       </section>
 
       {/* ══ SERVICES ══════════════════════════════════ */}
       <section id="services" style={{ background: "var(--bg1)", borderTop: LINE, borderBottom: LINE }}>
-        <div className="wrap" style={{ paddingBlock: "80px" }}>
-          <SectionHead label="What We Do" icon={Scissors} title="Services" />
+        <motion.div
+          className="wrap"
+          style={{ paddingBlock: "80px" }}
+          variants={sectionReveal}
+          initial={motionSafe.initial}
+          animate={motionSafe.animate}
+        >
+          <motion.div variants={revealItemVariants}>
+            <SectionHead label="What We Do" icon={Scissors} title="Services" />
+          </motion.div>
 
-          <div style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
-            gap: 1, background: "var(--line)"
-          }}>
-            {SERVICES.map(s => (
-              <div key={s.name} style={{
-                background: "var(--bg1)", padding: "28px 24px",
-                display: "flex", flexDirection: "column", gap: 12
-              }}>
+          <motion.div
+            variants={revealItemVariants}
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
+              gap: 1,
+              background: "var(--line)",
+            }}
+          >
+            {SERVICES.map((s) => (
+              <motion.div
+                key={s.name}
+                variants={revealItemVariants}
+                whileHover={!reducedMotion ? cardInteraction.whileHover : undefined}
+                transition={springTransition}
+                style={{
+                  background: "var(--bg1)",
+                  padding: "28px 24px",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 12,
+                  minWidth: 0,
+                }}
+              >
                 {/* Top row */}
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8 }}>
                   <h3 style={{ fontFamily: "Georgia,serif", fontSize: 17, fontWeight: 600, color: "var(--t1)" }}>
@@ -160,32 +232,49 @@ export default function Home() {
                   <span style={{ fontFamily: "Georgia,serif", fontSize: 22, color: G }}>{s.price}</span>
                   <Star size={11} style={{ color: "var(--line)" }} />
                 </div>
-              </div>
+              </motion.div>
             ))}
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       </section>
 
       {/* ══ BARBERS ═══════════════════════════════════ */}
       <section id="barbers" style={{ background: "var(--bg0)", borderTop: LINE, borderBottom: LINE }}>
-        <div className="wrap" style={{ paddingBlock: "80px" }}>
-          <SectionHead label="Meet The Team" icon={User} title="Our Barbers" />
+        <motion.div
+          className="wrap"
+          style={{ paddingBlock: "80px" }}
+          variants={sectionReveal}
+          initial={motionSafe.initial}
+          animate={motionSafe.animate}
+        >
+          <motion.div variants={revealItemVariants}>
+            <SectionHead label="Meet The Team" icon={User} title="Our Barbers" />
+          </motion.div>
 
-          <div style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))",
-            gap: 16
-          }}>
+          <motion.div
+            variants={revealItemVariants}
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))",
+              gap: 16,
+            }}
+          >
             {BARBERS.map((b) => (
-              <article key={b.name} style={{
-                background: "var(--bg2)",
-                border: LINE,
-                padding: "24px 20px",
-                display: "flex",
-                flexDirection: "column",
-                gap: 14,
-                minWidth: 0
-              }}>
+              <motion.article
+                key={b.name}
+                variants={revealItemVariants}
+                whileHover={!reducedMotion ? cardInteraction.whileHover : undefined}
+                transition={springTransition}
+                style={{
+                  background: "var(--bg2)",
+                  border: LINE,
+                  padding: "24px 20px",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 14,
+                  minWidth: 0,
+                }}
+              >
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10 }}>
                   <h3 style={{ fontFamily: "Georgia,serif", fontSize: 20, color: "var(--t1)" }}>{b.name}</h3>
                   <span style={{
@@ -206,69 +295,127 @@ export default function Home() {
                   <Scissors size={12} style={{ color: "var(--line)", flexShrink: 0 }} />
                   <span style={{ fontSize: 13, color: "var(--t2)" }}>{b.spec}</span>
                 </div>
-              </article>
+              </motion.article>
             ))}
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       </section>
 
       {/* ══ CONTACT ═══════════════════════════════════ */}
       <section id="contact" style={{ background: "var(--bg1)" }}>
-        <div className="wrap" style={{ paddingBlock: "80px" }}>
-          <SectionHead label="Find Us" icon={MapPin} title="Contact & Hours" />
+        <motion.div
+          className="wrap"
+          style={{ paddingBlock: "80px" }}
+          variants={sectionReveal}
+          initial={motionSafe.initial}
+          animate={motionSafe.animate}
+        >
+          <motion.div variants={revealItemVariants}>
+            <SectionHead label="Find Us" icon={MapPin} title="Contact & Hours" />
+          </motion.div>
 
-          <div style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
-            gap: 16
-          }}>
+          <motion.div
+            variants={revealItemVariants}
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
+              gap: 16,
+            }}
+          >
             {/* Location */}
-            <div style={{ background: "var(--bg2)", border: LINE, padding: "28px 24px" }}>
+            <motion.div
+              variants={revealItemVariants}
+              whileHover={!reducedMotion ? cardInteraction.whileHover : undefined}
+              transition={springTransition}
+              style={{ background: "var(--bg2)", border: LINE, padding: "28px 24px", minWidth: 0 }}
+            >
               <Label icon={MapPin} text="Location" />
               <div style={{ height: 1, background: "var(--line)", marginBottom: 20 }} />
               <p style={{ fontFamily: "Georgia,serif", fontSize: 16, color: "var(--t1)", lineHeight: 1.7, marginBottom: 16 }}>
                 1314 Leesburg Rd #D<br />Columbia, SC 29209
               </p>
-              <a href="https://maps.app.goo.gl/wB2TWPoKvvPeR5Lb9"
-                target="_blank" rel="noopener noreferrer"
-                style={{ fontSize: 11, color: "var(--t3)", textDecoration: "none", letterSpacing: "0.1em",
-                  display: "inline-flex", alignItems: "center", gap: 4 }}>
+              <motion.a
+                href="https://maps.app.goo.gl/wB2TWPoKvvPeR5Lb9"
+                target="_blank"
+                rel="noopener noreferrer"
+                whileHover={!reducedMotion ? cardInteraction.whileHover : undefined}
+                whileTap={!reducedMotion ? cardInteraction.whileTap : undefined}
+                transition={springTransition}
+                style={{
+                  fontSize: 11,
+                  color: "var(--t3)",
+                  textDecoration: "none",
+                  letterSpacing: "0.1em",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 4,
+                  maxWidth: "100%",
+                }}
+              >
                 Get Directions <ChevronRight size={11} />
-              </a>
-            </div>
+              </motion.a>
+              <p style={{ fontSize: 12, color: "var(--t3)", lineHeight: 1.65, marginTop: 16 }}>
+                Easy parking and quick in-and-out access right off Leesburg Rd.
+              </p>
+            </motion.div>
 
             {/* Hours */}
-            <div style={{ background: "var(--bg2)", border: LINE, padding: "28px 24px" }}>
+            <motion.div
+              variants={revealItemVariants}
+              whileHover={!reducedMotion ? cardInteraction.whileHover : undefined}
+              transition={springTransition}
+              style={{ background: "var(--bg2)", border: LINE, padding: "28px 24px", minWidth: 0 }}
+            >
               <Label icon={Clock} text="Hours" />
               <div style={{ height: 1, background: "var(--line)", marginBottom: 20 }} />
+              <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "6px 10px", border: `1px solid rgba(201,168,76,.24)`, marginBottom: 16, maxWidth: "100%" }}>
+                <span style={{ width: 7, height: 7, borderRadius: 999, background: G, flexShrink: 0 }} />
+                <span style={{ fontSize: 10, letterSpacing: "0.14em", textTransform: "uppercase", color: G, fontFamily: "system-ui,sans-serif" }}>
+                  Walk-ins welcome
+                </span>
+              </div>
               <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
                 {HOURS.map(([day, hrs]) => (
-                  <div key={day} style={{ display: "flex", justifyContent: "space-between" }}>
+                  <div key={day} style={{ display: "flex", justifyContent: "space-between", gap: 12 }}>
                     <span style={{ fontSize: 13, color: "var(--t2)" }}>{day}</span>
-                    <span style={{ fontSize: 13, color: hrs === "Closed" ? "var(--t3)" : "var(--t1)" }}>{hrs}</span>
+                    <span style={{ fontSize: 13, color: hrs === "Closed" ? "var(--t3)" : "var(--t1)", textAlign: "right" }}>{hrs}</span>
                   </div>
                 ))}
               </div>
-            </div>
+            </motion.div>
 
             {/* Book */}
-            <div style={{ background: "var(--bg2)", border: LINE, padding: "28px 24px" }}>
+            <motion.div
+              variants={revealItemVariants}
+              whileHover={!reducedMotion ? cardInteraction.whileHover : undefined}
+              transition={springTransition}
+              style={{ background: "var(--bg2)", border: LINE, padding: "28px 24px", minWidth: 0 }}
+            >
               <Label icon={Phone} text="Book" />
               <div style={{ height: 1, background: "var(--line)", marginBottom: 20 }} />
-              <p style={{ fontSize: 13, color: "var(--t3)", lineHeight: 1.7, marginBottom: 24 }}>
+              <p style={{ fontSize: 13, color: "var(--t3)", lineHeight: 1.7, marginBottom: 16 }}>
                 Walk-ins welcome.<br />Appointments recommended.
               </p>
-              <a href="tel:8037832993" style={{
-                display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
-                padding: "13px 0", background: G, color: "#080808",
-                fontSize: 11, fontWeight: 700, letterSpacing: "0.2em", textTransform: "uppercase",
-                textDecoration: "none", fontFamily: "system-ui,sans-serif", width: "100%"
-              }}>
+              <p style={{ fontSize: 12, color: "var(--t3)", lineHeight: 1.65, marginBottom: 20 }}>
+                Local favorite for reliable fades, beard work, and sharp finishing details.
+              </p>
+              <motion.a
+                href="tel:8037832993"
+                whileHover={!reducedMotion ? cardInteraction.whileHover : undefined}
+                whileTap={!reducedMotion ? cardInteraction.whileTap : undefined}
+                transition={springTransition}
+                style={{
+                  display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+                  padding: "13px 0", background: G, color: "#080808",
+                  fontSize: 11, fontWeight: 700, letterSpacing: "0.2em", textTransform: "uppercase",
+                  textDecoration: "none", fontFamily: "system-ui,sans-serif", width: "100%"
+                }}
+              >
                 <Phone size={13} /> (803) 783-2993
-              </a>
-            </div>
-          </div>
-        </div>
+              </motion.a>
+            </motion.div>
+          </motion.div>
+        </motion.div>
       </section>
 
       {/* ══ FOOTER ════════════════════════════════════ */}
