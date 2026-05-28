@@ -166,6 +166,52 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ══ BARBERS ═══════════════════════════════════ */}
+      <section id="barbers" style={{ background: "var(--bg0)", borderTop: LINE, borderBottom: LINE }}>
+        <div className="wrap" style={{ paddingBlock: "80px" }}>
+          <SectionHead label="Meet The Team" icon={User} title="Our Barbers" />
+
+          <div style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))",
+            gap: 16
+          }}>
+            {BARBERS.map((b) => (
+              <article key={b.name} style={{
+                background: "var(--bg2)",
+                border: LINE,
+                padding: "24px 20px",
+                display: "flex",
+                flexDirection: "column",
+                gap: 14,
+                minWidth: 0
+              }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10 }}>
+                  <h3 style={{ fontFamily: "Georgia,serif", fontSize: 20, color: "var(--t1)" }}>{b.name}</h3>
+                  <span style={{
+                    fontSize: 10,
+                    letterSpacing: "0.14em",
+                    textTransform: "uppercase",
+                    color: G,
+                    fontFamily: "system-ui,sans-serif",
+                    whiteSpace: "nowrap"
+                  }}>{b.exp}</span>
+                </div>
+
+                <p style={{ fontSize: 12, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--t3)" }}>
+                  {b.role}
+                </p>
+
+                <div style={{ marginTop: "auto", paddingTop: 12, borderTop: LINE, display: "flex", alignItems: "center", gap: 8 }}>
+                  <Scissors size={12} style={{ color: "var(--line)", flexShrink: 0 }} />
+                  <span style={{ fontSize: 13, color: "var(--t2)" }}>{b.spec}</span>
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ══ CONTACT ═══════════════════════════════════ */}
       <section id="contact" style={{ background: "var(--bg1)" }}>
         <div className="wrap" style={{ paddingBlock: "80px" }}>
