@@ -1,4 +1,4 @@
-import { defineConfig, devices } from "@playwright/test";
+import { defineConfig } from "@playwright/test";
 
 export default defineConfig({
   testDir: "./tests/e2e",
@@ -12,23 +12,41 @@ export default defineConfig({
   projects: [
     {
       name: "desktop-1920",
-      use: { ...devices["Desktop Chrome"], viewport: { width: 1920, height: 1080 } },
+      use: { browserName: "chromium", viewport: { width: 1920, height: 1080 } },
     },
     {
       name: "desktop-1280",
-      use: { ...devices["Desktop Chrome"], viewport: { width: 1280, height: 800 } },
+      use: { browserName: "chromium", viewport: { width: 1280, height: 800 } },
     },
     {
-      name: "tablet-ipad",
-      use: { ...devices["iPad Pro 11"] },
+      name: "tablet-834",
+      use: {
+        browserName: "chromium",
+        viewport: { width: 834, height: 1194 },
+        deviceScaleFactor: 2,
+        hasTouch: true,
+        isMobile: true,
+      },
     },
     {
-      name: "mobile-pixel5",
-      use: { ...devices["Pixel 5"] },
+      name: "mobile-393",
+      use: {
+        browserName: "chromium",
+        viewport: { width: 393, height: 851 },
+        deviceScaleFactor: 2.75,
+        hasTouch: true,
+        isMobile: true,
+      },
     },
     {
-      name: "mobile-iphone-se",
-      use: { ...devices["iPhone SE"] },
+      name: "mobile-375",
+      use: {
+        browserName: "chromium",
+        viewport: { width: 375, height: 667 },
+        deviceScaleFactor: 2,
+        hasTouch: true,
+        isMobile: true,
+      },
     },
   ],
   webServer: {
