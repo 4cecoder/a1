@@ -39,13 +39,19 @@ test.describe("Responsive smoke", () => {
     const desktopNav = await desktopNavbar(page);
     if (vp.width > 640) {
       await expect(desktopNav).toBeVisible();
-      await expect(desktopNav.getByRole("link", { name: /services/i })).toBeVisible();
-      await expect(desktopNav.getByRole("link", { name: /contact/i })).toBeVisible();
+      await expect(desktopNav.locator("a[href='#services']")).toBeVisible();
+      await expect(desktopNav.locator("a[href='#contact']")).toBeVisible();
+      await expect(desktopNav.locator("a[href^='tel:']")).toBeVisible();
     } else {
       const menuButton = header.getByRole("button");
       await expect(menuButton).toBeVisible();
       await menuButton.click();
-      await expect(page.getByRole("link", { name: /book now/i })).toBeVisible();
+
+      const mobileDrawer = page.getByTestId("navbar-mobile-drawer");
+      await expect(mobileDrawer).toBeVisible();
+      await expect(mobileDrawer.locator("a[href='#services']")).toBeVisible();
+      await expect(mobileDrawer.locator("a[href='#contact']")).toBeVisible();
+      await expect(mobileDrawer.locator("a[href^='tel:']")).toBeVisible();
     }
   });
 
@@ -53,7 +59,16 @@ test.describe("Responsive smoke", () => {
     const hero = page.locator("#hero");
     await expect(hero).toBeVisible();
     await expect(hero.getByRole("heading", { level: 1, name: /a1/i })).toBeVisible();
-    await expect(hero.locator("a[href='tel:8037832993']")).toBeVisible();
+
+    const callCta = hero.locator("a[href='tel:8037832993']");
+    const servicesCta = hero.locator("a[href='#services']");
+    await expect(callCta).toBeVisible();
+    await expect(servicesCta).toBeVisible();
+
+    await callCta.focus();
+    await expect(callCta).toBeFocused();
+    await servicesCta.focus();
+    await expect(servicesCta).toBeFocused();
   });
 
   test("services section is visible and does not overflow", async ({ page }) => {
@@ -81,14 +96,23 @@ test.describe("Responsive smoke", () => {
 
   test("contact section checks", async ({ page }) => {
     await scrollToIfPresent(page, "#contact");
-    await expect(page.locator("#contact")).toBeVisible();
+    const contact = page.locator("#contact");
+    await expect(contact).toBeVisible();
     await expect(page.getByText("1314 Leesburg Rd #D")).toBeVisible();
     await expect(page.getByText("Columbia, SC 29209")).toBeVisible();
     await expect(page.getByText("(803) 783-2993")).toBeVisible();
 
-    const directions = page.getByRole("link", { name: /get directions/i });
+    const directions = contact.locator("a[href*='maps.app.goo.gl']");
     await expect(directions).toBeVisible();
     await expect(directions).toHaveAttribute("href", /maps\.app\.goo\.gl/);
+
+    const contactCallCta = contact.locator("a[href='tel:8037832993']");
+    await expect(contactCallCta).toBeVisible();
+
+    await directions.focus();
+    await expect(directions).toBeFocused();
+    await contactCallCta.focus();
+    await expect(contactCallCta).toBeFocused();
 
     await expectNoHorizontalOverflow(page);
   });
