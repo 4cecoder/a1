@@ -26,6 +26,18 @@ async function expectNoHorizontalOverflow(page: Page) {
   expect(scrollWidth).toBeLessThanOrEqual(vp!.width + 5);
 }
 
+async function setFormFieldValue(field: Locator, value: string) {
+  await expect(field).toBeVisible();
+
+  const tagName = await field.evaluate((el) => el.tagName.toLowerCase());
+  if (tagName === "select") {
+    await field.selectOption(value);
+    return;
+  }
+
+  await field.fill(value);
+}
+
 test.describe("Responsive smoke", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("/");
@@ -69,6 +81,32 @@ test.describe("Responsive smoke", () => {
     await expect(callCta).toBeFocused();
     await servicesCta.focus();
     await expect(servicesCta).toBeFocused();
+  });
+
+  test("booking drawer funnel completes using stable hooks", async ({ page }) => {
+    await page.getByTestId("booking-open").click();
+
+    const bookingDrawer = page.getByTestId("booking-drawer");
+    await expect(bookingDrawer).toBeVisible();
+
+    const step1 = page.getByTestId("booking-step-1");
+    await expect(step1).toBeVisible();
+
+    await setFormFieldValue(step1.locator("input").nth(0), "E2E Smoke");
+    await setFormFieldValue(step1.locator("input").nth(1), "8037832993");
+    await setFormFieldValue(step1.locator("select").first(), "Fade");
+
+    await page.getByTestId("booking-next").click();
+
+    const step2 = page.getByTestId("booking-step-2");
+    await expect(step2).toBeVisible();
+
+    await setFormFieldValue(step2.locator("select").nth(0), "No preference");
+    await setFormFieldValue(step2.locator("select").nth(1), "No preference");
+    await setFormFieldValue(step2.locator("textarea").first(), "Playwright smoke test");
+
+    await page.getByTestId("booking-submit").click();
+    await expect(page.getByTestId("booking-success")).toBeVisible();
   });
 
   test("services section is visible and does not overflow", async ({ page }) => {
