@@ -1,6 +1,7 @@
 "use client";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
-import { Scissors, MapPin, Phone, Clock, Star, ChevronRight, User } from "lucide-react";
+import { Scissors, MapPin, Phone, Clock, Star, ChevronRight, User, X } from "lucide-react";
 import {
   cardInteraction,
   createRevealVariants,
@@ -12,12 +13,12 @@ import Navbar from "./components/Navbar";
 
 /* ─── Data ─────────────────────────────────────────── */
 const SERVICES = [
-  { name: "Classic Cut",     price: "$25", desc: "Clean, sharp, timeless.",         popular: false },
-  { name: "Fade",            price: "$30", desc: "Low, mid, or high — dialed in.",   popular: true  },
-  { name: "Beard Trim",      price: "$15", desc: "Lined up and looking right.",      popular: false },
-  { name: "Cut + Beard",     price: "$40", desc: "The full treatment.",              popular: true  },
-  { name: "Hot Towel Shave", price: "$35", desc: "Old school. The real deal.",       popular: false },
-  { name: "Kid's Cut",       price: "$18", desc: "Ages 12 and under.",               popular: false },
+  { name: "Classic Cut",     price: "$25", desc: "Clean, sharp, timeless.",         duration: "35 min", popular: false },
+  { name: "Fade",            price: "$30", desc: "Low, mid, or high — dialed in.",   duration: "45 min", popular: true  },
+  { name: "Beard Trim",      price: "$15", desc: "Lined up and looking right.",      duration: "20 min", popular: false },
+  { name: "Cut + Beard",     price: "$40", desc: "The full treatment.",              duration: "55 min", popular: true  },
+  { name: "Hot Towel Shave", price: "$35", desc: "Old school. The real deal.",       duration: "40 min", popular: false },
+  { name: "Kid's Cut",       price: "$18", desc: "Ages 12 and under.",               duration: "30 min", popular: false },
 ];
 
 const BARBERS = [
@@ -64,6 +65,84 @@ export default function Home() {
   const motionSafe = getReducedMotionProps(Boolean(reducedMotion));
   const heroReveal = createRevealVariants(0.07, 0.05);
   const sectionReveal = createRevealVariants(0.05, 0.02);
+  const [isBookingOpen, setIsBookingOpen] = useState(false);
+  const [bookingStep, setBookingStep] = useState<1 | 2>(1);
+  const [bookingSubmitted, setBookingSubmitted] = useState(false);
+  const [bookingForm, setBookingForm] = useState({
+    name: "",
+    phone: "",
+    service: SERVICES[0]?.name ?? "",
+    barber: "No preference",
+    timeWindow: "No preference",
+    notes: "",
+  });
+  const nameInputRef = useRef<HTMLInputElement>(null);
+
+  const selectedService = useMemo(
+    () => SERVICES.find((service) => service.name === bookingForm.service) ?? SERVICES[0],
+    [bookingForm.service]
+  );
+
+  useEffect(() => {
+    if (!isBookingOpen) {
+      return;
+    }
+
+    const previousBodyOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const focusTimer = window.setTimeout(() => {
+      nameInputRef.current?.focus();
+    }, 40);
+
+    const onEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setIsBookingOpen(false);
+      }
+    };
+
+    window.addEventListener("keydown", onEscape);
+
+    return () => {
+      window.clearTimeout(focusTimer);
+      window.removeEventListener("keydown", onEscape);
+      document.body.style.overflow = previousBodyOverflow;
+    };
+  }, [isBookingOpen]);
+
+  function updateBookingField<K extends keyof typeof bookingForm>(field: K, value: (typeof bookingForm)[K]) {
+    setBookingForm((current) => ({ ...current, [field]: value }));
+  }
+
+  function openBookingDrawer() {
+    setIsBookingOpen(true);
+    setBookingStep(1);
+    setBookingSubmitted(false);
+  }
+
+  function closeBookingDrawer() {
+    setIsBookingOpen(false);
+  }
+
+  function handleBookingNext() {
+    if (bookingForm.name.trim() && bookingForm.phone.trim() && bookingForm.service) {
+      setBookingStep(2);
+    }
+  }
+
+  function handleBookingBack() {
+    setBookingStep(1);
+  }
+
+  function handleBookingSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!bookingForm.name.trim() || !bookingForm.phone.trim() || !bookingForm.service) {
+      setBookingStep(1);
+      return;
+    }
+
+    setBookingSubmitted(true);
+    setBookingStep(1);
+  }
 
   return (
     <>
@@ -128,6 +207,24 @@ export default function Home() {
 
           {/* CTAs */}
           <motion.div variants={revealItemVariants} style={{ display: "flex", flexWrap: "wrap", gap: 12, marginBottom: 56 }}>
+            <motion.button
+              type="button"
+              data-testid="booking-open"
+              onClick={openBookingDrawer}
+              whileHover={!reducedMotion ? cardInteraction.whileHover : undefined}
+              whileTap={!reducedMotion ? cardInteraction.whileTap : undefined}
+              transition={springTransition}
+              style={{
+                display: "inline-flex", alignItems: "center", gap: 8,
+                padding: "13px 28px", background: G, color: "#080808",
+                border: "none",
+                cursor: "pointer",
+                fontSize: 11, fontWeight: 700, letterSpacing: "0.2em", textTransform: "uppercase",
+                textDecoration: "none", fontFamily: "system-ui,sans-serif"
+              }}
+            >
+              <Scissors size={13} /> BOOK APPOINTMENT
+            </motion.button>
             <motion.a
               href="tel:8037832993"
               whileHover={!reducedMotion ? cardInteraction.whileHover : undefined}
@@ -135,8 +232,8 @@ export default function Home() {
               transition={springTransition}
               style={{
                 display: "inline-flex", alignItems: "center", gap: 8,
-                padding: "13px 28px", background: G, color: "#080808",
-                fontSize: 11, fontWeight: 700, letterSpacing: "0.2em", textTransform: "uppercase",
+                padding: "13px 28px", border: LINE,
+                color: "var(--t2)", fontSize: 11, letterSpacing: "0.2em", textTransform: "uppercase",
                 textDecoration: "none", fontFamily: "system-ui,sans-serif"
               }}
             >
@@ -149,8 +246,8 @@ export default function Home() {
               transition={springTransition}
               style={{
                 display: "inline-flex", alignItems: "center", gap: 8,
-                padding: "13px 28px", border: LINE,
-                color: "var(--t2)", fontSize: 11, letterSpacing: "0.2em", textTransform: "uppercase",
+                padding: "13px 20px", border: LINE,
+                color: "var(--t3)", fontSize: 11, letterSpacing: "0.16em", textTransform: "uppercase",
                 textDecoration: "none", fontFamily: "system-ui,sans-serif"
               }}
             >
@@ -417,6 +514,288 @@ export default function Home() {
           </motion.div>
         </motion.div>
       </section>
+
+      {/* ══ BOOKING DRAWER ═════════════════════════════ */}
+      {isBookingOpen && (
+        <div
+          data-testid="booking-drawer"
+          style={{
+            position: "fixed",
+            inset: 0,
+            zIndex: 70,
+            display: "flex",
+            alignItems: "flex-end",
+            justifyContent: "center",
+            overflowX: "hidden",
+          }}
+        >
+          <button
+            type="button"
+            aria-label="Close booking drawer"
+            onClick={closeBookingDrawer}
+            style={{
+              position: "absolute",
+              inset: 0,
+              border: "none",
+              background: "rgba(0, 0, 0, 0.62)",
+              cursor: "pointer",
+            }}
+          />
+
+          <motion.div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="booking-drawer-title"
+            initial={{ y: 40, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={springTransition}
+            style={{
+              position: "relative",
+              width: "100%",
+              maxWidth: 620,
+              maxHeight: "90svh",
+              overflowY: "auto",
+              overflowX: "hidden",
+              borderTop: LINE,
+              borderLeft: LINE,
+              borderRight: LINE,
+              background: "var(--bg1)",
+              borderTopLeftRadius: 18,
+              borderTopRightRadius: 18,
+              padding: "22px 18px 24px",
+              boxShadow: "0 -12px 40px rgba(0,0,0,.5)",
+            }}
+          >
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, marginBottom: 16 }}>
+              <div style={{ minWidth: 0 }}>
+                <p style={{ fontSize: 10, letterSpacing: "0.16em", textTransform: "uppercase", color: G, marginBottom: 4 }}>Book Appointment</p>
+                <h3 id="booking-drawer-title" style={{ fontFamily: "Georgia,serif", fontSize: 26, color: "var(--t1)", lineHeight: 1.05 }}>
+                  Quick Booking
+                </h3>
+              </div>
+
+              <button
+                type="button"
+                onClick={closeBookingDrawer}
+                aria-label="Close"
+                style={{
+                  width: 38,
+                  height: 38,
+                  borderRadius: 999,
+                  border: LINE,
+                  background: "var(--bg2)",
+                  color: "var(--t2)",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  cursor: "pointer",
+                  flexShrink: 0,
+                }}
+              >
+                <X size={15} />
+              </button>
+            </div>
+
+            <div style={{ border: LINE, background: "var(--bg2)", padding: "12px 14px", marginBottom: 16 }}>
+              <p style={{ fontSize: 10, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--t3)", marginBottom: 8 }}>
+                Selected Service
+              </p>
+              <p style={{ fontFamily: "Georgia,serif", fontSize: 20, color: G, marginBottom: 6 }}>
+                {selectedService?.name}
+              </p>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: "8px 16px", color: "var(--t2)", fontSize: 13 }}>
+                <span>Duration: <strong>{selectedService?.duration}</strong></span>
+                <span>Starting at: <strong>{selectedService?.price}</strong></span>
+              </div>
+            </div>
+
+            {bookingSubmitted ? (
+              <div data-testid="booking-success" style={{ border: `1px solid rgba(201,168,76,.35)`, background: "rgba(201,168,76,.08)", padding: "16px 14px" }}>
+                <p style={{ color: G, fontFamily: "Georgia,serif", fontSize: 22, marginBottom: 8 }}>Request Received</p>
+                <p style={{ fontSize: 13, color: "var(--t2)", lineHeight: 1.7, marginBottom: 14 }}>
+                  Thanks, {bookingForm.name || "there"}. We&apos;ll reach out at {bookingForm.phone || "your number"} to confirm your appointment.
+                </p>
+                <button
+                  type="button"
+                  onClick={closeBookingDrawer}
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    padding: "11px 16px",
+                    border: LINE,
+                    background: "var(--bg1)",
+                    color: "var(--t1)",
+                    fontSize: 11,
+                    letterSpacing: "0.14em",
+                    textTransform: "uppercase",
+                    cursor: "pointer",
+                    fontFamily: "system-ui,sans-serif",
+                  }}
+                >
+                  Close
+                </button>
+              </div>
+            ) : (
+              <form onSubmit={handleBookingSubmit}>
+                {bookingStep === 1 ? (
+                  <div data-testid="booking-step-1" style={{ display: "grid", gap: 12 }}>
+                    <label style={{ display: "grid", gap: 6 }}>
+                      <span style={{ fontSize: 12, color: "var(--t2)" }}>Name *</span>
+                      <input
+                        ref={nameInputRef}
+                        type="text"
+                        value={bookingForm.name}
+                        onChange={(event) => updateBookingField("name", event.target.value)}
+                        required
+                        style={{ width: "100%", padding: "11px 12px", border: LINE, background: "var(--bg0)", color: "var(--t1)", fontSize: 14 }}
+                      />
+                    </label>
+
+                    <label style={{ display: "grid", gap: 6 }}>
+                      <span style={{ fontSize: 12, color: "var(--t2)" }}>Phone *</span>
+                      <input
+                        type="tel"
+                        value={bookingForm.phone}
+                        onChange={(event) => updateBookingField("phone", event.target.value)}
+                        required
+                        style={{ width: "100%", padding: "11px 12px", border: LINE, background: "var(--bg0)", color: "var(--t1)", fontSize: 14 }}
+                      />
+                    </label>
+
+                    <label style={{ display: "grid", gap: 6 }}>
+                      <span style={{ fontSize: 12, color: "var(--t2)" }}>Service *</span>
+                      <select
+                        value={bookingForm.service}
+                        onChange={(event) => updateBookingField("service", event.target.value)}
+                        required
+                        style={{ width: "100%", padding: "11px 12px", border: LINE, background: "var(--bg0)", color: "var(--t1)", fontSize: 14 }}
+                      >
+                        {SERVICES.map((service) => (
+                          <option key={service.name} value={service.name}>
+                            {service.name} ({service.duration}) · {service.price}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+
+                    <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 6 }}>
+                      <button
+                        type="button"
+                        data-testid="booking-next"
+                        onClick={handleBookingNext}
+                        style={{
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: 8,
+                          padding: "12px 18px",
+                          background: G,
+                          border: "none",
+                          color: "#080808",
+                          fontSize: 11,
+                          fontWeight: 700,
+                          letterSpacing: "0.18em",
+                          textTransform: "uppercase",
+                          cursor: "pointer",
+                          fontFamily: "system-ui,sans-serif",
+                        }}
+                      >
+                        Next <ChevronRight size={13} />
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div data-testid="booking-step-2" style={{ display: "grid", gap: 12 }}>
+                    <label style={{ display: "grid", gap: 6 }}>
+                      <span style={{ fontSize: 12, color: "var(--t2)" }}>Preferred barber</span>
+                      <select
+                        value={bookingForm.barber}
+                        onChange={(event) => updateBookingField("barber", event.target.value)}
+                        style={{ width: "100%", padding: "11px 12px", border: LINE, background: "var(--bg0)", color: "var(--t1)", fontSize: 14 }}
+                      >
+                        <option value="No preference">No preference</option>
+                        {BARBERS.map((barber) => (
+                          <option key={barber.name} value={barber.name}>
+                            {barber.name}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+
+                    <label style={{ display: "grid", gap: 6 }}>
+                      <span style={{ fontSize: 12, color: "var(--t2)" }}>Preferred time window</span>
+                      <select
+                        value={bookingForm.timeWindow}
+                        onChange={(event) => updateBookingField("timeWindow", event.target.value)}
+                        style={{ width: "100%", padding: "11px 12px", border: LINE, background: "var(--bg0)", color: "var(--t1)", fontSize: 14 }}
+                      >
+                        <option value="No preference">No preference</option>
+                        <option value="Morning (9AM–12PM)">Morning (9AM–12PM)</option>
+                        <option value="Afternoon (12PM–4PM)">Afternoon (12PM–4PM)</option>
+                        <option value="Evening (4PM–7PM)">Evening (4PM–7PM)</option>
+                      </select>
+                    </label>
+
+                    <label style={{ display: "grid", gap: 6 }}>
+                      <span style={{ fontSize: 12, color: "var(--t2)" }}>Notes</span>
+                      <textarea
+                        value={bookingForm.notes}
+                        onChange={(event) => updateBookingField("notes", event.target.value)}
+                        rows={4}
+                        style={{ width: "100%", resize: "vertical", padding: "11px 12px", border: LINE, background: "var(--bg0)", color: "var(--t1)", fontSize: 14 }}
+                      />
+                    </label>
+
+                    <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", gap: 10, marginTop: 6 }}>
+                      <button
+                        type="button"
+                        onClick={handleBookingBack}
+                        style={{
+                          display: "inline-flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          padding: "12px 16px",
+                          border: LINE,
+                          background: "var(--bg2)",
+                          color: "var(--t1)",
+                          fontSize: 11,
+                          letterSpacing: "0.16em",
+                          textTransform: "uppercase",
+                          cursor: "pointer",
+                          fontFamily: "system-ui,sans-serif",
+                        }}
+                      >
+                        Back
+                      </button>
+                      <button
+                        type="submit"
+                        data-testid="booking-submit"
+                        style={{
+                          display: "inline-flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          padding: "12px 18px",
+                          background: G,
+                          border: "none",
+                          color: "#080808",
+                          fontSize: 11,
+                          fontWeight: 700,
+                          letterSpacing: "0.18em",
+                          textTransform: "uppercase",
+                          cursor: "pointer",
+                          fontFamily: "system-ui,sans-serif",
+                        }}
+                      >
+                        Submit Request
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </form>
+            )}
+          </motion.div>
+        </div>
+      )}
 
       {/* ══ FOOTER ════════════════════════════════════ */}
       <footer style={{ background: "var(--bg0)", borderTop: LINE, padding: "20px 0" }}>
