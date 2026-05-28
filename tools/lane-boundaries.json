@@ -1,0 +1,44 @@
+{
+  "lanes": [
+    {
+      "name": "lane-layout-shell",
+      "globs": [
+        "app/layout.tsx",
+        "app/globals.css"
+      ]
+    },
+    {
+      "name": "lane-navbar",
+      "globs": [
+        "app/components/Navbar.tsx"
+      ]
+    },
+    {
+      "name": "lane-home-sections",
+      "globs": [
+        "app/page.tsx"
+      ]
+    },
+    {
+      "name": "lane-ui-primitives",
+      "globs": [
+        "components/ui/**",
+        "lib/utils.ts"
+      ]
+    },
+    {
+      "name": "lane-e2e",
+      "globs": [
+        "tests/e2e/**",
+        "playwright.config.ts"
+      ]
+    }
+  ],
+  "sharedPaths": [
+    "docs/**",
+    "tools/**",
+    "package.json",
+    "bun.lock",
+    ".gitignore"
+  ]
+}

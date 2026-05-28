@@ -12,6 +12,10 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Local generated artifacts:
+    ".netlify/**",
+    "test-results/**",
+    "playwright-report/**",
   ]),
 ]);
 
