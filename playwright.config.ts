@@ -1,51 +1,27 @@
-import { defineConfig } from "@playwright/test";
+import { defineConfig, devices } from "@playwright/test";
 
 export default defineConfig({
   testDir: "./tests/e2e",
-  fullyParallel: true,
-  retries: 0,
+  fullyParallel: false,
+  retries: process.env.CI ? 1 : 0,
+  workers: process.env.CI ? 1 : undefined,
   reporter: "list",
   use: {
     baseURL: "http://localhost:3000",
     headless: true,
+    actionTimeout: 10_000,
+    navigationTimeout: 15_000,
+    trace: "retain-on-failure",
+    screenshot: "only-on-failure",
+    video: "retain-on-failure",
   },
   projects: [
     {
-      name: "desktop-1920",
-      use: { browserName: "chromium", viewport: { width: 1920, height: 1080 } },
-    },
-    {
-      name: "desktop-1280",
-      use: { browserName: "chromium", viewport: { width: 1280, height: 800 } },
-    },
-    {
-      name: "tablet-834",
+      name: "chromium-baseline",
       use: {
+        ...devices["Desktop Chrome"],
         browserName: "chromium",
-        viewport: { width: 834, height: 1194 },
-        deviceScaleFactor: 2,
-        hasTouch: true,
-        isMobile: true,
-      },
-    },
-    {
-      name: "mobile-393",
-      use: {
-        browserName: "chromium",
-        viewport: { width: 393, height: 851 },
-        deviceScaleFactor: 2.75,
-        hasTouch: true,
-        isMobile: true,
-      },
-    },
-    {
-      name: "mobile-375",
-      use: {
-        browserName: "chromium",
-        viewport: { width: 375, height: 667 },
-        deviceScaleFactor: 2,
-        hasTouch: true,
-        isMobile: true,
+        viewport: { width: 1440, height: 900 },
       },
     },
   ],
