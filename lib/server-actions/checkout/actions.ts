@@ -1,6 +1,6 @@
 "use server"
 
-import { mockPaymentProvider } from "@/lib/services/payments/mock-provider"
+import { getPaymentProvider } from "@/lib/services/payments/provider"
 import {
   type ActionResult,
   type CheckoutConfirmPayload,
@@ -27,7 +27,9 @@ export async function startCheckout(
 
   const normalized = validation.data
 
-  const intentResult = await mockPaymentProvider.createIntent({
+  const paymentProvider = getPaymentProvider()
+
+  const intentResult = await paymentProvider.createIntent({
     amountCents: normalized.amountCents,
     currency: normalized.currency,
     paymentMethodToken: normalized.paymentMethodToken,
@@ -63,7 +65,9 @@ export async function confirmCheckout(
     return validation
   }
 
-  return mockPaymentProvider.captureIntent(validation.data)
+  const paymentProvider = getPaymentProvider()
+
+  return paymentProvider.captureIntent(validation.data)
 }
 
 export async function fetchReceipt(receiptId: string): Promise<ActionResult<PaymentReceipt>> {
@@ -73,5 +77,7 @@ export async function fetchReceipt(receiptId: string): Promise<ActionResult<Paym
     return validation
   }
 
-  return mockPaymentProvider.getReceipt(validation.data)
+  const paymentProvider = getPaymentProvider()
+
+  return paymentProvider.getReceipt(validation.data)
 }

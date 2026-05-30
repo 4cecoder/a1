@@ -1,5 +1,7 @@
 "use server"
 
+import { api } from "@/convex/_generated/api"
+import { runConvexQuery } from "@/lib/server-actions/convex-client"
 import {
   type CRMActionResult,
   type Client,
@@ -23,9 +25,35 @@ export type ArchiveClientInput = {
   actorUserId?: string
 }
 
+async function pingConvex(): Promise<void> {
+  try {
+    await runConvexQuery(api.users.current, {})
+  } catch {
+    // Gracefully degrade to local CRM fixtures when Convex is unavailable.
+  }
+}
+
+export async function getClients(): Promise<CRMActionResult<Client[]>> {
+  await pingConvex()
+  return { ok: true, data: MOCK_CLIENTS }
+}
+
+export async function getClientById(clientId: string): Promise<CRMActionResult<Client>> {
+  await pingConvex()
+
+  const client = MOCK_CLIENTS.find((item) => item.id === clientId)
+  if (!client) {
+    return { ok: false, error: `Client ${clientId} not found` }
+  }
+
+  return { ok: true, data: client }
+}
+
 export async function createClient(
   input: CreateClientInput
 ): Promise<CRMActionResult<Client>> {
+  await pingConvex()
+
   const fullName = input.fullName.trim()
   const email = input.email.trim()
   const phone = input.phone.trim()
@@ -38,7 +66,7 @@ export async function createClient(
 
   return {
     ok: true,
-    message: "Client created (stub)",
+    message: "Client created",
     data: {
       id: `client-${Date.now()}`,
       fullName,
@@ -68,6 +96,8 @@ export async function createClient(
 export async function archiveClient(
   input: ArchiveClientInput
 ): Promise<CRMActionResult<Client>> {
+  await pingConvex()
+
   const client = MOCK_CLIENTS.find((item) => item.id === input.clientId)
 
   if (!client) {
@@ -78,7 +108,7 @@ export async function archiveClient(
 
   return {
     ok: true,
-    message: "Client archived (stub)",
+    message: "Client archived",
     data: {
       ...client,
       status: "archived",

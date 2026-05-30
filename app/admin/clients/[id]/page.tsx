@@ -2,16 +2,15 @@ import Link from "next/link"
 
 import { ClientProfileCard } from "@/components/admin/crm/ClientProfileCard"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { archiveClient } from "@/lib/server-actions/clients/actions"
-import { MOCK_CLIENTS } from "@/lib/types/crm"
+import { archiveClient, getClientById } from "@/lib/server-actions/clients/actions"
 
 type ParamsInput = Promise<{ id: string }> | { id: string }
 
 export default async function ClientDetailPage({ params }: { params: ParamsInput }) {
   const resolvedParams = await params
-  const client = MOCK_CLIENTS.find((item) => item.id === resolvedParams.id)
+  const clientResult = await getClientById(resolvedParams.id)
 
-  if (!client) {
+  if (!clientResult.ok) {
     return (
       <main className="mx-auto max-w-4xl p-6">
         <p className="text-sm text-muted-foreground">Client not found.</p>
@@ -22,12 +21,12 @@ export default async function ClientDetailPage({ params }: { params: ParamsInput
     )
   }
 
-  const resolvedClient = client as (typeof MOCK_CLIENTS)[number]
+  const client = clientResult.data
 
   async function archiveAction(formData: FormData) {
     "use server"
     await archiveClient({
-      clientId: resolvedClient.id,
+      clientId: client.id,
       reason: String(formData.get("reason") ?? "") || undefined,
     })
   }

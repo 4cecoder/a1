@@ -24,4 +24,12 @@ test.describe("full system smoke baseline", () => {
       expect(response!.status(), `Unexpected status for ${path}`).toBeLessThan(500);
     }
   });
+
+  test("confirm route surfaces recoverable checkout failures", async ({ page }) => {
+    await page.goto("/book/confirm?service=classic-cut&barber=no_preference&date=2026-05-30&slot=2026-05-30-no_preference-540&intent=pi_missing_demo");
+
+    await expect(page.getByRole("heading", { name: /we could not finalize payment/i })).toBeVisible();
+    await expect(page.getByRole("link", { name: /try payment again/i })).toBeVisible();
+    await expect(page.getByRole("link", { name: /pick a different slot/i })).toBeVisible();
+  });
 });

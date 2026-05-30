@@ -1,8 +1,7 @@
 import { ClientList } from "@/components/admin/crm/ClientList"
-import { createClient } from "@/lib/server-actions/clients/actions"
+import { createClient, getClients } from "@/lib/server-actions/clients/actions"
 import {
   CLIENT_STATUSES,
-  MOCK_CLIENTS,
   type CRMOwner,
   type Client,
   type ClientFilters,
@@ -89,8 +88,10 @@ export default async function AdminClientsPage({
   const params = (await searchParams) ?? {}
   const filters = parseFilters(params)
 
-  const clients = filterClients(MOCK_CLIENTS, filters)
-  const tags = [...new Set(MOCK_CLIENTS.flatMap((client) => client.tags))].sort((a, b) => a.localeCompare(b))
+  const clientsResult = await getClients()
+  const allClients = clientsResult.ok ? clientsResult.data : []
+  const clients = filterClients(allClients, filters)
+  const tags = [...new Set(allClients.flatMap((client) => client.tags))].sort((a, b) => a.localeCompare(b))
 
   async function createClientAction(formData: FormData) {
     "use server"

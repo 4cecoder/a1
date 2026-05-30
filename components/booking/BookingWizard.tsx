@@ -20,6 +20,7 @@ import {
   findSlotById,
   validateBookingSelection,
 } from "@/lib/services/booking/slots";
+import { startCheckout } from "@/lib/server-actions/checkout/actions";
 
 const STEP_ORDER: BookingStep[] = ["service", "barber", "slot", "checkout"];
 
@@ -138,14 +139,45 @@ export default function BookingWizard() {
       return;
     }
 
-    // Placeholder for server action / Convex mutation call.
-    startTransition(() => {
+    if (!service || !barber || !selectedSlot) {
+      setErrorMessage("Booking details are incomplete. Please review and try again.");
+      return;
+    }
+
+    setErrorMessage(null);
+    setUnavailableMessage(null);
+
+    startTransition(async () => {
+      const startResult = await startCheckout({
+        amountCents: service.priceCents,
+        currency: "USD",
+        paymentMethodToken: `tok_mock_${selection.slotId}`,
+        customerName: "Walk-in Guest",
+        customerEmail: "guest@example.com",
+        serviceName: service.name,
+        metadata: {
+          serviceId: selection.serviceId,
+          barberId: selection.barberId,
+          dateKey: selection.dateKey,
+          slotId: selection.slotId,
+          slotLabel: selectedSlot.label,
+          barberLabel: barber.label,
+        },
+      });
+
+      if (!startResult.ok) {
+        setErrorMessage(startResult.error);
+        return;
+      }
+
       const params = new URLSearchParams({
         service: selection.serviceId,
         barber: selection.barberId,
         date: selection.dateKey,
         slot: selection.slotId,
+        intent: startResult.data.intent.id,
       });
+
       router.push(`/book/confirm?${params.toString()}`);
     });
   }

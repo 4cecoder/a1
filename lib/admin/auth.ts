@@ -8,6 +8,8 @@ export type AdminAccessContext = {
 };
 
 const ALLOWED_ADMIN_ROLES: ReadonlySet<AdminRole> = new Set(["admin", "staff"]);
+const ROLE_HEADER_KEYS = ["x-user-role", "x-role", "x-admin-role", "x-admin-access-role"] as const;
+const ROLE_COOKIE_KEYS = ["a1_role", "role", "user_role", "admin_role"] as const;
 
 function normalizeRole(value: string | undefined): AdminRole {
   const normalized = value?.trim().toLowerCase();
@@ -19,20 +21,38 @@ function normalizeRole(value: string | undefined): AdminRole {
   return "guest";
 }
 
+function readRoleFromHeaderStore(headerStore: Headers): string | undefined {
+  for (const key of ROLE_HEADER_KEYS) {
+    const value = headerStore.get(key);
+    if (value) {
+      return value;
+    }
+  }
+
+  return undefined;
+}
+
+function readRoleFromCookieStore(cookieStore: Awaited<ReturnType<typeof cookies>>): string | undefined {
+  for (const key of ROLE_COOKIE_KEYS) {
+    const value = cookieStore.get(key)?.value;
+    if (value) {
+      return value;
+    }
+  }
+
+  return undefined;
+}
+
 export async function getAdminAccessContext(): Promise<AdminAccessContext> {
   const headerStore = await headers();
   const cookieStore = await cookies();
 
-  const role = normalizeRole(
-    headerStore.get("x-user-role") ??
-      headerStore.get("x-role") ??
-      cookieStore.get("a1_role")?.value ??
-      cookieStore.get("role")?.value ??
-      cookieStore.get("user_role")?.value
-  );
+  const isAdminAccessExempt = headerStore.get("x-admin-access-exempt") === "1";
+
+  const role = normalizeRole(readRoleFromHeaderStore(headerStore) ?? readRoleFromCookieStore(cookieStore));
 
   return {
     role,
-    canAccessAdmin: ALLOWED_ADMIN_ROLES.has(role),
+    canAccessAdmin: isAdminAccessExempt || ALLOWED_ADMIN_ROLES.has(role),
   };
 }

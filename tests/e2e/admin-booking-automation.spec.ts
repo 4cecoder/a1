@@ -23,41 +23,31 @@ test.describe("admin + booking automation flow", () => {
     await expect(page.getByRole("button", { name: /save automation settings/i })).toBeVisible();
   });
 
-  test("book flow renders and progresses through key steps with stable selectors", async ({ page }) => {
-    const response = await page.goto("/", { waitUntil: "domcontentloaded" });
+  test("book wizard confirms payment and exposes receipt route", async ({ page }) => {
+    const response = await page.goto("/book", { waitUntil: "domcontentloaded" });
     expect(response).not.toBeNull();
     expect(response!.status()).toBeLessThan(500);
 
-    await expect(page.getByTestId("booking-open")).toBeVisible();
-    await page.getByTestId("booking-open").click();
+    await page.getByRole("button", { name: /^Classic Cut/i }).click();
+    await page.getByRole("button", { name: /No preference/i }).first().click();
+    await page.getByRole("button", { name: /continue to barber preference/i }).click();
 
-    await expect(page.getByTestId("booking-drawer")).toBeVisible();
-    const step1 = page.getByTestId("booking-step-1");
-    await expect(step1).toBeVisible();
+    await page.getByRole("button", { name: /continue to date & slot/i }).click();
+    await page.getByRole("button", { name: /9:00 AM -/i }).click();
+    await page.getByRole("button", { name: /review checkout/i }).click();
+    await page.getByRole("button", { name: /confirm booking/i }).click();
 
-    await step1.locator("input").nth(0).fill("Wave 4 QA");
-    await step1.locator("input").nth(1).fill("8035550111");
+    await expect(page).toHaveURL(/\/book\/confirm\?/);
+    await expect(page.getByRole("heading", { name: /payment confirmed/i })).toBeVisible();
 
-    const serviceSelect = step1.locator("select").first();
-    const optionCount = await serviceSelect.locator("option").count();
-    expect(optionCount).toBeGreaterThan(0);
-    const serviceValue = (await serviceSelect.locator("option").first().getAttribute("value")) ?? "";
-    expect(serviceValue.length).toBeGreaterThan(0);
-    await serviceSelect.selectOption(serviceValue);
+    const receiptLink = page.getByRole("link", { name: /view receipt/i });
+    await expect(receiptLink).toBeVisible();
+    const href = await receiptLink.getAttribute("href");
+    expect(href).toMatch(/^\/book\/receipt\//);
 
-    await page.getByTestId("booking-next").click();
-
-    const step2 = page.getByTestId("booking-step-2");
-    await expect(step2).toBeVisible();
-
-    const selects = step2.locator("select");
-    const selectCount = await selects.count();
-    expect(selectCount).toBeGreaterThanOrEqual(2);
-    await selects.nth(0).selectOption({ label: "No preference" });
-    await selects.nth(1).selectOption({ label: "No preference" });
-    await step2.locator("textarea").fill("Playwright Wave 4 flow");
-
-    await page.getByTestId("booking-submit").click();
-    await expect(page.getByTestId("booking-success")).toBeVisible();
+    await receiptLink.click();
+    await expect(page).toHaveURL(/\/book\/receipt\//);
+    await expect(page.getByRole("heading", { name: /payment receipt/i })).toBeVisible();
+    await expect(page.getByText(/paid in full via mock provider/i)).toBeVisible();
   });
 });

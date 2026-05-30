@@ -59,12 +59,38 @@ export const seedInitialData = mutation({
       inserted += 1;
     }
 
+    const existingAutomationDefaults = await ctx.db
+      .query("notificationAutomationSettings")
+      .withIndex("by_scope", (q) => q.eq("scope", "default"))
+      .unique();
+
+    if (!existingAutomationDefaults) {
+      if (!dryRun) {
+        await ctx.db.insert("notificationAutomationSettings", {
+          scope: "default",
+          confirmationEnabled: true,
+          confirmationSendImmediately: true,
+          reminderOffsetsMinutes: [24 * 60, 2 * 60],
+          noShowFollowUpEnabled: true,
+          noShowFollowUpOffsetMinutes: 12 * 60,
+          internalGapAlertEnabled: false,
+          internalGapAlertThresholdMinutes: 6 * 60,
+          updatedByUserId: undefined,
+          createdAt: now,
+          updatedAt: now,
+        });
+      }
+      inserted += 1;
+    } else {
+      skipped += 1;
+    }
+
     return {
       ok: true,
       dryRun,
       inserted,
       skipped,
-      note: "Idempotent-friendly seed skeleton. Extend with admin/staff/users once auth provider wiring lands.",
+      note: "Idempotent-friendly seed skeleton. Services + default notification automation settings are safe to rerun.",
     };
   },
 });

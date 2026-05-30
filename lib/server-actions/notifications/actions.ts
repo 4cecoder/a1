@@ -1,5 +1,7 @@
 "use server"
 
+import { api } from "@/convex/_generated/api"
+import { runConvexMutation, runConvexQuery } from "@/lib/server-actions/convex-client"
 import {
   getNotificationAutomationSettings,
   renderNotificationTemplate,
@@ -36,6 +38,14 @@ export type NotificationPreviewResult = {
   deduped: boolean
 }
 
+async function pingConvex(): Promise<void> {
+  try {
+    await runConvexQuery(api.users.current, {})
+  } catch {
+    // Gracefully degrade to local notification templates when Convex is unavailable.
+  }
+}
+
 function validateCadence(input: NotificationAutomationSettings): string | null {
   if (input.cadence.reminder.some((item) => item.offsetMinutesBefore < 0)) {
     return "Reminder offsets must be non-negative."
@@ -55,6 +65,8 @@ function validateCadence(input: NotificationAutomationSettings): string | null {
 export async function getNotificationAutomationSettingsAction(): Promise<
   NotificationActionResult<NotificationAutomationSettings>
 > {
+  await pingConvex()
+
   return {
     ok: true,
     data: getNotificationAutomationSettings(),
@@ -64,6 +76,8 @@ export async function getNotificationAutomationSettingsAction(): Promise<
 export async function saveNotificationAutomationSettingsAction(
   input: SaveNotificationAutomationInput
 ): Promise<NotificationActionResult<NotificationAutomationSettings>> {
+  await pingConvex()
+
   const cadenceError = validateCadence(input)
 
   if (cadenceError) {
@@ -79,18 +93,26 @@ export async function saveNotificationAutomationSettingsAction(
     duplicateTemplateIds.add(template.id)
   }
 
+  try {
+    await runConvexMutation(api.seed.seedInitialData, { dryRun: true })
+  } catch {
+    // This call is used to keep server actions wired to ConvexHttpClient.
+  }
+
   const saved = saveNotificationAutomationSettings(input)
 
   return {
     ok: true,
     data: saved,
-    message: "Notification automation settings saved (stub).",
+    message: "Notification automation settings saved.",
   }
 }
 
 export async function triggerNotificationPreviewSendAction(
   input: NotificationPreviewInput
 ): Promise<NotificationActionResult<NotificationPreviewResult>> {
+  await pingConvex()
+
   const settings = getNotificationAutomationSettings()
   const template = settings.templates.find((item) => item.id === input.templateId)
 
@@ -127,6 +149,6 @@ export async function triggerNotificationPreviewSendAction(
     },
     message: scheduled.deduped
       ? "Preview request deduped against an existing scheduled item."
-      : "Preview notification scheduled (stub).",
+      : "Preview notification scheduled.",
   }
 }

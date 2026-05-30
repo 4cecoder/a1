@@ -1,8 +1,12 @@
 import AutomationForm from "./components/AutomationForm"
-import { getNotificationAutomationSettings } from "@/lib/notifications/templates"
+import { getNotificationAutomationSettingsAction } from "@/lib/server-actions/notifications/actions"
 
-export default function AdminAutomationSettingsPage() {
-  const settings = getNotificationAutomationSettings()
+export default async function AdminAutomationSettingsPage() {
+  const settingsResult = await getNotificationAutomationSettingsAction()
+
+  if (!settingsResult.ok) {
+    throw new Error(settingsResult.error)
+  }
 
   return (
     <main className="mx-auto flex w-full max-w-6xl flex-col gap-6 p-6">
@@ -13,7 +17,7 @@ export default function AdminAutomationSettingsPage() {
         </p>
       </header>
 
-      <AutomationForm initialSettings={settings} />
+      <AutomationForm initialSettings={settingsResult.data} />
     </main>
   )
 }

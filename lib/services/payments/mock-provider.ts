@@ -4,9 +4,9 @@ import {
   type CheckoutConfirmResponse,
   type CreatePaymentIntentInput,
   type PaymentIntent,
-  type PaymentProvider,
   type PaymentReceipt,
 } from "@/lib/types/payments"
+import type { PaymentProvider } from "@/lib/services/payments/types"
 
 const intentStore = new Map<string, PaymentIntent>()
 const receiptStore = new Map<string, PaymentReceipt>()

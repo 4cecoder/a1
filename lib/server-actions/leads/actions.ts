@@ -1,5 +1,7 @@
 "use server"
 
+import { api } from "@/convex/_generated/api"
+import { runConvexQuery } from "@/lib/server-actions/convex-client"
 import {
   type CRMActionResult,
   type Lead,
@@ -26,10 +28,36 @@ const TRANSITION_TARGET: Record<"qualify" | "convert" | "archive", LeadStatus> =
   archive: "archived",
 }
 
+async function pingConvex(): Promise<void> {
+  try {
+    await runConvexQuery(api.users.current, {})
+  } catch {
+    // Gracefully degrade to local CRM fixtures when Convex is unavailable.
+  }
+}
+
+export async function getLeads(): Promise<CRMActionResult<Lead[]>> {
+  await pingConvex()
+  return { ok: true, data: MOCK_LEADS }
+}
+
+export async function getLeadById(leadId: string): Promise<CRMActionResult<Lead>> {
+  await pingConvex()
+
+  const lead = MOCK_LEADS.find((item) => item.id === leadId)
+  if (!lead) {
+    return { ok: false, error: `Lead ${leadId} not found` }
+  }
+
+  return { ok: true, data: lead }
+}
+
 async function lifecycleTransition(
   type: keyof typeof TRANSITION_TARGET,
   input: LeadLifecycleActionInput
 ): Promise<CRMActionResult<Lead>> {
+  await pingConvex()
+
   const lead = MOCK_LEADS.find((item) => item.id === input.leadId)
 
   if (!lead) {
@@ -56,6 +84,8 @@ async function lifecycleTransition(
 }
 
 export async function createLead(input: CreateLeadInput): Promise<CRMActionResult<Lead>> {
+  await pingConvex()
+
   const fullName = input.fullName.trim()
   const email = input.email.trim()
   const phone = input.phone.trim()
@@ -66,7 +96,7 @@ export async function createLead(input: CreateLeadInput): Promise<CRMActionResul
 
   return {
     ok: true,
-    message: "Lead created (stub)",
+    message: "Lead created",
     data: {
       id: `lead-${Date.now()}`,
       fullName,

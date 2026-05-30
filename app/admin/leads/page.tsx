@@ -1,9 +1,8 @@
 import { LeadFunnel } from "@/components/admin/crm/LeadFunnel"
 import { LeadList } from "@/components/admin/crm/LeadList"
-import { createLead } from "@/lib/server-actions/leads/actions"
+import { createLead, getLeads } from "@/lib/server-actions/leads/actions"
 import {
   LEAD_STATUSES,
-  MOCK_LEADS,
   type CRMOwner,
   type Lead,
   type LeadFilters,
@@ -90,8 +89,10 @@ export default async function AdminLeadsPage({
   const params = (await searchParams) ?? {}
   const filters = parseFilters(params)
 
-  const leads = filterLeads(MOCK_LEADS, filters)
-  const tags = [...new Set(MOCK_LEADS.flatMap((lead) => lead.tags))].sort((a, b) => a.localeCompare(b))
+  const leadsResult = await getLeads()
+  const allLeads = leadsResult.ok ? leadsResult.data : []
+  const leads = filterLeads(allLeads, filters)
+  const tags = [...new Set(allLeads.flatMap((lead) => lead.tags))].sort((a, b) => a.localeCompare(b))
 
   async function createLeadAction(formData: FormData) {
     "use server"
@@ -146,7 +147,7 @@ export default async function AdminLeadsPage({
         </form>
       </section>
 
-      <LeadFunnel leads={MOCK_LEADS} />
+      <LeadFunnel leads={allLeads} />
       <LeadList leads={leads} filters={filters} availableTags={tags} />
     </main>
   )

@@ -1,3 +1,5 @@
+import type { PaymentProvider } from "@/lib/services/payments/types"
+
 export const PAYMENT_INTENT_STATUSES = [
   "requires_capture",
   "succeeded",
@@ -105,8 +107,4 @@ export type ActionResult<T> =
   | { ok: true; data: T; message?: string }
   | { ok: false; error: string; code: ActionErrorCode }
 
-export interface PaymentProvider {
-  createIntent(input: CreatePaymentIntentInput): Promise<ActionResult<PaymentIntent>>
-  captureIntent(input: CapturePaymentIntentInput): Promise<ActionResult<CheckoutConfirmResponse>>
-  getReceipt(receiptId: string): Promise<ActionResult<PaymentReceipt>>
-}
+export type { PaymentProvider }

@@ -11,6 +11,15 @@ import {
   validateCheckoutStartPayload,
   validateReceiptId,
 } from "@/lib/server-actions/checkout/validation";
+import {
+  confirmCheckout,
+  fetchReceipt,
+  startCheckout,
+} from "@/lib/server-actions/checkout/actions";
+import {
+  getPaymentProvider,
+  resolvePaymentProviderName,
+} from "@/lib/services/payments/provider";
 
 describe("booking flow helpers", () => {
   test("createBookingDateOptions builds consecutive date keys from a reference date", () => {
@@ -219,5 +228,87 @@ describe("checkout validation", () => {
 
     const receiptMissing = validateReceiptId("   ");
     expect(receiptMissing.ok).toBe(false);
+  });
+});
+
+describe("checkout server actions + provider factory", () => {
+  test("provider factory resolves env and defaults to mock", () => {
+    const previous = process.env.PAYMENT_PROVIDER;
+
+    process.env.PAYMENT_PROVIDER = "mock";
+    expect(resolvePaymentProviderName()).toBe("mock");
+
+    process.env.PAYMENT_PROVIDER = "MOCK";
+    expect(resolvePaymentProviderName()).toBe("mock");
+
+    process.env.PAYMENT_PROVIDER = "something-else";
+    expect(resolvePaymentProviderName()).toBe("mock");
+
+    const provider = getPaymentProvider();
+    expect(provider).toBeTruthy();
+    expect(typeof provider.createIntent).toBe("function");
+    expect(typeof provider.captureIntent).toBe("function");
+    expect(typeof provider.getReceipt).toBe("function");
+
+    process.env.PAYMENT_PROVIDER = previous;
+  });
+
+  test("checkout actions execute full deterministic mock flow", async () => {
+    const startResult = await startCheckout({
+      amountCents: 3000,
+      currency: "USD",
+      paymentMethodToken: "tok_mock_success",
+      customerName: "Jordan Client",
+      customerEmail: "jordan@example.com",
+      serviceName: "Fade",
+      metadata: {
+        barberId: "marcus",
+        slotId: "2026-05-30-marcus-660",
+      },
+    });
+
+    expect(startResult.ok).toBe(true);
+    if (!startResult.ok) return;
+
+    expect(startResult.data.intent.status).toBe("requires_capture");
+
+    const confirmResult = await confirmCheckout({ intentId: startResult.data.intent.id });
+    expect(confirmResult.ok).toBe(true);
+    if (!confirmResult.ok) return;
+
+    expect(confirmResult.data.intent.status).toBe("succeeded");
+    expect(confirmResult.data.receipt.status).toBe("succeeded");
+    expect(confirmResult.data.receipt.intentId).toBe(startResult.data.intent.id);
+
+    const receiptResult = await fetchReceipt(confirmResult.data.receipt.id);
+    expect(receiptResult.ok).toBe(true);
+    if (!receiptResult.ok) return;
+
+    expect(receiptResult.data.id).toBe(confirmResult.data.receipt.id);
+    expect(receiptResult.data.serviceName).toBe("Fade");
+  });
+
+  test("checkout actions preserve recoverable capture failure", async () => {
+    const startResult = await startCheckout({
+      amountCents: 2500,
+      currency: "USD",
+      paymentMethodToken: "tok_mock_capture_failure",
+      customerName: "Jordan Client",
+      customerEmail: "jordan@example.com",
+      serviceName: "Classic Cut",
+      simulation: "capture_failure",
+    });
+
+    expect(startResult.ok).toBe(true);
+    if (!startResult.ok) return;
+
+    const confirmResult = await confirmCheckout({
+      intentId: startResult.data.intent.id,
+      simulation: "capture_failure",
+    });
+
+    expect(confirmResult.ok).toBe(false);
+    if (confirmResult.ok) return;
+    expect(confirmResult.code).toBe("capture_failed");
   });
 });

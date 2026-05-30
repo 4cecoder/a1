@@ -2,8 +2,8 @@ import Link from "next/link"
 
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { archiveLead, convertLead, qualifyLead } from "@/lib/server-actions/leads/actions"
-import { CRM_LIFECYCLE_FLOW, MOCK_LEADS } from "@/lib/types/crm"
+import { archiveLead, convertLead, getLeadById, qualifyLead } from "@/lib/server-actions/leads/actions"
+import { CRM_LIFECYCLE_FLOW } from "@/lib/types/crm"
 
 type ParamsInput = Promise<{ id: string }> | { id: string }
 
@@ -20,9 +20,9 @@ function formatDate(input?: string): string {
 
 export default async function LeadDetailPage({ params }: { params: ParamsInput }) {
   const resolvedParams = await params
-  const lead = MOCK_LEADS.find((item) => item.id === resolvedParams.id)
+  const leadResult = await getLeadById(resolvedParams.id)
 
-  if (!lead) {
+  if (!leadResult.ok) {
     return (
       <main className="mx-auto max-w-4xl p-6">
         <p className="text-sm text-muted-foreground">Lead not found.</p>
@@ -33,12 +33,12 @@ export default async function LeadDetailPage({ params }: { params: ParamsInput }
     )
   }
 
-  const resolvedLead = lead as (typeof MOCK_LEADS)[number]
+  const lead = leadResult.data
 
   async function qualifyAction(formData: FormData) {
     "use server"
     await qualifyLead({
-      leadId: resolvedLead.id,
+      leadId: lead.id,
       note: String(formData.get("note") ?? "") || undefined,
     })
   }
@@ -46,7 +46,7 @@ export default async function LeadDetailPage({ params }: { params: ParamsInput }
   async function convertAction(formData: FormData) {
     "use server"
     await convertLead({
-      leadId: resolvedLead.id,
+      leadId: lead.id,
       note: String(formData.get("note") ?? "") || undefined,
     })
   }
@@ -54,7 +54,7 @@ export default async function LeadDetailPage({ params }: { params: ParamsInput }
   async function archiveAction(formData: FormData) {
     "use server"
     await archiveLead({
-      leadId: resolvedLead.id,
+      leadId: lead.id,
       note: String(formData.get("note") ?? "") || undefined,
     })
   }

@@ -1,19 +1,37 @@
 import { mutation, query } from "./_generated/server";
+import type { QueryCtx } from "./_generated/server";
 import { v } from "convex/values";
 import { assertRole, type Role } from "./roles";
+
+async function getUserFromAuth(ctx: QueryCtx) {
+  const identity = await ctx.auth.getUserIdentity();
+  if (!identity) return null;
+
+  return await ctx.db
+    .query("users")
+    .withIndex("by_external_id", (q) => q.eq("externalId", identity.subject))
+    .unique();
+}
 
 export const current = query({
   args: {},
   handler: async (ctx) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) return null;
+    return await getUserFromAuth(ctx);
+  },
+});
 
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_external_id", (q) => q.eq("externalId", identity.subject))
-      .unique();
+export const getCurrentUser = query({
+  args: {},
+  handler: async (ctx) => {
+    return await getUserFromAuth(ctx);
+  },
+});
 
-    return user;
+export const getMyRole = query({
+  args: {},
+  handler: async (ctx) => {
+    const user = await getUserFromAuth(ctx);
+    return user?.role ?? null;
   },
 });
 

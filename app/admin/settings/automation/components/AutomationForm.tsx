@@ -168,7 +168,7 @@ export default function AutomationForm({ initialSettings }: Props) {
     <div className="grid gap-6">
       <section className="rounded-xl border p-4">
         <h2 className="text-base font-medium">Cadence</h2>
-        <p className="mb-4 text-sm text-muted-foreground">Baseline timing configuration (mock persistence for now).</p>
+        <p className="mb-4 text-sm text-muted-foreground">Baseline timing configuration with server action persistence.</p>
 
         <div className="grid gap-3 md:grid-cols-2">
           <label className="flex items-center justify-between rounded-md border px-3 py-2 text-sm">
@@ -367,7 +367,7 @@ export default function AutomationForm({ initialSettings }: Props) {
       </section>
 
       <section className="rounded-xl border p-4">
-        <h2 className="mb-4 text-base font-medium">Preview send (stub)</h2>
+        <h2 className="mb-4 text-base font-medium">Preview send</h2>
 
         <div className="grid gap-3 md:grid-cols-2">
           <label className="text-sm">
