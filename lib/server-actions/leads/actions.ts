@@ -1,7 +1,7 @@
 "use server"
 
 import { api } from "@/convex/_generated/api"
-import { runConvexQuery } from "@/lib/server-actions/convex-client"
+import { runConvexQuery, runConvexMutation } from "@/lib/server-actions/convex-client"
 import {
   type CRMActionResult,
   type Lead,
@@ -11,8 +11,10 @@ import {
 
 export type CreateLeadInput = Pick<
   Lead,
-  "fullName" | "email" | "phone" | "source" | "owner" | "tags" | "potentialService"
+  "fullName" | "source" | "owner" | "tags" | "potentialService"
 > & {
+  email?: string
+  phone?: string
   notes?: string
 }
 
@@ -28,45 +30,65 @@ const TRANSITION_TARGET: Record<"qualify" | "convert" | "archive", LeadStatus> =
   archive: "archived",
 }
 
-async function pingConvex(): Promise<void> {
-  try {
-    await runConvexQuery(api.users.current, {})
-  } catch {
-    // Gracefully degrade to local CRM fixtures when Convex is unavailable.
-  }
-}
-
 export async function getLeads(): Promise<CRMActionResult<Lead[]>> {
-  await pingConvex()
-  return { ok: true, data: MOCK_LEADS }
+  try {
+    const data = await runConvexQuery(api.crm.listLeads, {})
+    return { ok: true, data: data as Lead[] }
+  } catch {
+    return { ok: true, data: MOCK_LEADS }
+  }
 }
 
 export async function getLeadById(leadId: string): Promise<CRMActionResult<Lead>> {
-  await pingConvex()
+  try {
+    const leads = await runConvexQuery(api.crm.listLeads, {})
+    const list = leads as Lead[]
+    const lead = list.find((item) => item.id === leadId)
+    if (!lead) {
+      return { ok: false, error: `Lead ${leadId} not found` }
+    }
+    return { ok: true, data: lead }
+  } catch {
+    const lead = MOCK_LEADS.find((item) => item.id === leadId)
+    if (!lead) {
+      return { ok: false, error: `Lead ${leadId} not found` }
+    }
+    return { ok: true, data: lead }
+  }
+}
 
-  const lead = MOCK_LEADS.find((item) => item.id === leadId)
-  if (!lead) {
-    return { ok: false, error: `Lead ${leadId} not found` }
+export async function createLead(input: CreateLeadInput): Promise<CRMActionResult<Lead>> {
+  const fullName = input.fullName?.trim() ?? ""
+
+  if (!fullName) {
+    return { ok: false, error: "fullName is required" }
   }
 
-  return { ok: true, data: lead }
+  try {
+    const data = await runConvexMutation(api.crm.createLead, {
+      fullName,
+      phone: input.phone,
+      email: input.email,
+      source: input.source,
+      tags: input.tags,
+      notes: input.notes,
+    })
+    return { ok: true, message: "Lead created", data: data as Lead }
+  } catch (err) {
+    return { ok: false, error: err instanceof Error ? err.message : String(err) }
+  }
 }
 
 async function lifecycleTransition(
   type: keyof typeof TRANSITION_TARGET,
   input: LeadLifecycleActionInput
 ): Promise<CRMActionResult<Lead>> {
-  await pingConvex()
-
   const lead = MOCK_LEADS.find((item) => item.id === input.leadId)
-
   if (!lead) {
     return { ok: false, error: `Lead ${input.leadId} not found` }
   }
-
   const now = new Date().toISOString()
   const targetStatus = TRANSITION_TARGET[type]
-
   const updated: Lead = {
     ...lead,
     status: targetStatus,
@@ -75,58 +97,17 @@ async function lifecycleTransition(
     convertedAt: targetStatus === "converted" || lead.convertedAt ? now : lead.convertedAt,
     archivedAt: targetStatus === "archived" || lead.archivedAt ? now : lead.archivedAt,
   }
-
-  return {
-    ok: true,
-    data: updated,
-    message: `Lead moved to ${targetStatus}`,
-  }
+  return { ok: true, data: updated, message: `Lead moved to ${targetStatus}` }
 }
 
-export async function createLead(input: CreateLeadInput): Promise<CRMActionResult<Lead>> {
-  await pingConvex()
-
-  const fullName = input.fullName.trim()
-  const email = input.email.trim()
-  const phone = input.phone.trim()
-
-  if (!fullName || !email || !phone) {
-    return { ok: false, error: "fullName, email, and phone are required" }
-  }
-
-  return {
-    ok: true,
-    message: "Lead created",
-    data: {
-      id: `lead-${Date.now()}`,
-      fullName,
-      email,
-      phone,
-      source: input.source,
-      owner: input.owner,
-      tags: [...new Set(input.tags.map((tag) => tag.trim()).filter(Boolean))],
-      potentialService: input.potentialService,
-      notes: input.notes,
-      status: "new",
-      createdAt: new Date().toISOString(),
-    },
-  }
-}
-
-export async function qualifyLead(
-  input: LeadLifecycleActionInput
-): Promise<CRMActionResult<Lead>> {
+export async function qualifyLead(input: LeadLifecycleActionInput): Promise<CRMActionResult<Lead>> {
   return lifecycleTransition("qualify", input)
 }
 
-export async function convertLead(
-  input: LeadLifecycleActionInput
-): Promise<CRMActionResult<Lead>> {
+export async function convertLead(input: LeadLifecycleActionInput): Promise<CRMActionResult<Lead>> {
   return lifecycleTransition("convert", input)
 }
 
-export async function archiveLead(
-  input: LeadLifecycleActionInput
-): Promise<CRMActionResult<Lead>> {
+export async function archiveLead(input: LeadLifecycleActionInput): Promise<CRMActionResult<Lead>> {
   return lifecycleTransition("archive", input)
 }

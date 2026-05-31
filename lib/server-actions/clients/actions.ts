@@ -1,7 +1,7 @@
 "use server"
 
 import { api } from "@/convex/_generated/api"
-import { runConvexQuery } from "@/lib/server-actions/convex-client"
+import { runConvexQuery, runConvexMutation } from "@/lib/server-actions/convex-client"
 import {
   type CRMActionResult,
   type Client,
@@ -11,9 +11,9 @@ import {
 
 export type CreateClientInput = {
   fullName: string
-  email: string
-  phone: string
-  owner: CRMOwner
+  email?: string
+  phone?: string
+  owner?: CRMOwner
   tags?: string[]
   preferredServices?: string[]
   notes?: string
@@ -25,104 +25,92 @@ export type ArchiveClientInput = {
   actorUserId?: string
 }
 
-async function pingConvex(): Promise<void> {
-  try {
-    await runConvexQuery(api.users.current, {})
-  } catch {
-    // Gracefully degrade to local CRM fixtures when Convex is unavailable.
-  }
-}
-
 export async function getClients(): Promise<CRMActionResult<Client[]>> {
-  await pingConvex()
-  return { ok: true, data: MOCK_CLIENTS }
+  try {
+    const data = await runConvexQuery(api.crm.listLeads, { status: "converted" })
+    return { ok: true, data: data as Client[] }
+  } catch {
+    return { ok: true, data: MOCK_CLIENTS }
+  }
 }
 
 export async function getClientById(clientId: string): Promise<CRMActionResult<Client>> {
-  await pingConvex()
-
-  const client = MOCK_CLIENTS.find((item) => item.id === clientId)
-  if (!client) {
-    return { ok: false, error: `Client ${clientId} not found` }
+  try {
+    const clients = await runConvexQuery(api.crm.listLeads, { status: "converted" })
+    const list = clients as Client[]
+    const client = list.find((item) => item.id === clientId)
+    if (!client) {
+      return { ok: false, error: `Client ${clientId} not found` }
+    }
+    return { ok: true, data: client }
+  } catch {
+    const client = MOCK_CLIENTS.find((item) => item.id === clientId)
+    if (!client) {
+      return { ok: false, error: `Client ${clientId} not found` }
+    }
+    return { ok: true, data: client }
   }
-
-  return { ok: true, data: client }
 }
 
 export async function createClient(
   input: CreateClientInput
 ): Promise<CRMActionResult<Client>> {
-  await pingConvex()
+  const fullName = input.fullName?.trim() ?? ""
 
-  const fullName = input.fullName.trim()
-  const email = input.email.trim()
-  const phone = input.phone.trim()
-
-  if (!fullName || !email || !phone) {
-    return { ok: false, error: "fullName, email, and phone are required" }
+  if (!fullName) {
+    return { ok: false, error: "fullName is required" }
   }
 
-  const now = new Date().toISOString()
-
-  return {
-    ok: true,
-    message: "Client created",
-    data: {
-      id: `client-${Date.now()}`,
+  try {
+    const data = await runConvexMutation(api.crm.createClient, {
       fullName,
-      email,
-      phone,
-      owner: input.owner,
-      tags: [...new Set((input.tags ?? []).map((tag) => tag.trim()).filter(Boolean))],
-      preferredServices: input.preferredServices?.filter(Boolean) ?? [],
+      phone: input.phone,
+      email: input.email,
+      tags: input.tags,
+      preferredServices: input.preferredServices,
       notes: input.notes,
-      joinedAt: now,
-      totalVisits: 0,
-      lifetimeValueUsd: 0,
-      status: "active",
-      timeline: [
-        {
-          id: `ev-${Date.now()}`,
-          at: now,
-          label: "Client created",
-          detail: "Created through admin CRM action",
-          type: "lifecycle",
-        },
-      ],
-    },
+    })
+    return { ok: true, message: "Client created", data: data as Client }
+  } catch (err) {
+    return { ok: false, error: err instanceof Error ? err.message : String(err) }
   }
 }
 
 export async function archiveClient(
   input: ArchiveClientInput
 ): Promise<CRMActionResult<Client>> {
-  await pingConvex()
-
-  const client = MOCK_CLIENTS.find((item) => item.id === input.clientId)
-
-  if (!client) {
-    return { ok: false, error: `Client ${input.clientId} not found` }
-  }
-
-  const now = new Date().toISOString()
-
-  return {
-    ok: true,
-    message: "Client archived",
-    data: {
-      ...client,
-      status: "archived",
-      notes: input.reason ? `${client.notes ?? ""}\nArchive reason: ${input.reason}`.trim() : client.notes,
-      timeline: [
-        {
-          id: `ev-${Date.now()}`,
-          at: now,
-          label: "Client archived",
-          detail: input.reason ?? "Archived by admin",
-          type: "lifecycle",
-        },
-        ...client.timeline,
-      ],
-    },
+  try {
+    const data = await runConvexMutation(api.crm.archiveClient, {
+      clientId: input.clientId as unknown as never,
+      reason: input.reason,
+      actorUserId: input.actorUserId,
+    })
+    return { ok: true, message: "Client archived", data: data as Client }
+  } catch (err) {
+    // Fallback to mock
+    const client = MOCK_CLIENTS.find((item) => item.id === input.clientId)
+    if (!client) {
+      return { ok: false, error: `Client ${input.clientId} not found` }
+    }
+    const now = new Date().toISOString()
+    return {
+      ok: true,
+      message: "Client archived",
+      data: {
+        ...client,
+        status: "archived",
+        notes: input.reason ? `${client.notes ?? ""}\nArchive reason: ${input.reason}`.trim() : client.notes,
+        timeline: [
+          {
+            id: `ev-${Date.now()}`,
+            at: now,
+            label: "Client archived",
+            detail: input.reason ?? "Archived by admin",
+            type: "lifecycle",
+          },
+          ...client.timeline,
+        ],
+      },
+    }
   }
 }
