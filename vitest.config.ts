@@ -11,6 +11,9 @@ export default defineConfig({
     include: [
       "tests/unit/hero-image.test.tsx",
       "tests/unit/server-actions.test.ts",
+      "tests/unit/booking-flow.test.tsx",
+      "tests/unit/admin-dashboard.test.tsx",
+      "tests/unit/admin-schedule.test.tsx",
     ],
   },
   resolve: {

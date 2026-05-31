@@ -15,7 +15,22 @@
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }
-body { background: var(--bg0); color: var(--t1); font-family: system-ui, sans-serif; }
+body {
+  background: var(--bg0);
+  color: var(--t1);
+  font-family: system-ui, sans-serif;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+}
+
+/* ── Typography ─────────────────────────────────────── */
+h1, h2, h3 {
+  font-family: var(--font-display), Georgia, serif;
+  letter-spacing: -0.02em;
+}
+
+.price, .stat-number {
+  font-family: var(--font-mono), monospace;
+}
 
 /* ── Shared layout ─────────────────────────────────── */
 .wrap {
@@ -37,4 +52,27 @@ body { background: var(--bg0); color: var(--t1); font-family: system-ui, sans-se
   );
   border-radius: 2px;
   flex-shrink: 0;
+}
+
+/* ── Service card hover gold left border ───────────── */
+.service-card-wrapper {
+  position: relative;
+  overflow: hidden;
+}
+
+.service-card-wrapper::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--gold);
+  transform: scaleY(0);
+  transform-origin: bottom;
+  transition: transform 0.2s ease;
+}
+
+.service-card-wrapper:hover::before {
+  transform: scaleY(1);
 }

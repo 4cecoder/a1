@@ -2,6 +2,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { Scissors, MapPin, Phone, Clock, Star, ChevronRight, User, X } from "lucide-react";
+import Image from "next/image";
 import {
   cardInteraction,
   createRevealVariants,
@@ -10,6 +11,7 @@ import {
   springTransition,
 } from "../lib/motion";
 import Navbar from "./components/Navbar";
+import { HeroMosaic } from "./components/HeroMosaic";
 
 /* ─── Data ─────────────────────────────────────────── */
 const SERVICES = [
@@ -22,15 +24,22 @@ const SERVICES = [
 ];
 
 const BARBERS = [
-  { name: "Marcus",  role: "Master Barber",  exp: "12 yrs", spec: "Fades & Tapers"   },
-  { name: "DeShawn", role: "Senior Barber",  exp: "8 yrs",  spec: "Beards & Lineups" },
-  { name: "Ray",     role: "Barber",         exp: "4 yrs",  spec: "Classic Cuts"     },
+  { name: "Marcus",  role: "Master Barber",  exp: "12 yrs", spec: "Fades & Tapers",   portrait: "https://images.pexels.com/photos/1681010/pexels-photo-1681010.jpeg?auto=compress&w=400&h=500&fit=crop" },
+  { name: "DeShawn", role: "Senior Barber",  exp: "8 yrs",  spec: "Beards & Lineups", portrait: "https://images.pexels.com/photos/1043473/pexels-photo-1043473.jpeg?auto=compress&w=400&h=500&fit=crop" },
+  { name: "Ray",     role: "Barber",         exp: "4 yrs",  spec: "Classic Cuts",     portrait: "https://images.pexels.com/photos/2379005/pexels-photo-2379005.jpeg?auto=compress&w=400&h=500&fit=crop" },
 ];
 
 const HOURS = [
   ["Mon – Fri", "9AM – 7PM"],
   ["Saturday",  "9AM – 6PM"],
   ["Sunday",    "Closed"   ],
+];
+
+const TESTIMONIALS = [
+  { name: "Darius M.",  quote: "Marcus hooked me up with the cleanest fade I've had in years. Won't go anywhere else.",    service: "Fade",           rating: 5 },
+  { name: "Kevin T.",   quote: "DeShawn lined me up so sharp my barber back home was asking who did it.",                   service: "Cut + Beard",    rating: 5 },
+  { name: "Jordan L.",  quote: "Walked in without an appointment and was out in 40 minutes looking fresh. Solid shop.",     service: "Classic Cut",    rating: 5 },
+  { name: "Marcus B.",  quote: "Best hot towel shave in Columbia. Old school experience, modern precision.",                service: "Hot Towel Shave", rating: 5 },
 ];
 
 /* ─── Tiny helpers ─────────────────────────────────── */
@@ -150,16 +159,35 @@ export default function Home() {
 
       {/* ══ HERO ══════════════════════════════════════ */}
       <section id="hero" style={{
-        minHeight: "100svh", display: "flex", alignItems: "center", paddingTop: 64,
-        background: "linear-gradient(160deg, var(--bg0) 60%, #130000 100%)"
+        minHeight: "100svh", display: "flex", flexDirection: "column", justifyContent: "center", paddingTop: 64,
+        background: "linear-gradient(160deg, var(--bg0) 60%, #130000 100%)",
+        boxShadow: "var(--glow-gold)",
       }}>
+        {/* Hero background image */}
+        <div style={{ position: "absolute", inset: 0, zIndex: 0, overflow: "hidden" }}>
+          <Image
+            src="https://images.pexels.com/photos/1319460/pexels-photo-1319460.jpeg?auto=compress&w=1920&h=1080&fit=crop"
+            alt="A1 Cuts barbershop interior — premium chairs and classic atmosphere"
+            fill
+            priority
+            sizes="100vw"
+            style={{ objectFit: "cover", opacity: 0.18 }}
+          />
+          <div style={{
+            position: "absolute", inset: 0,
+            background: "linear-gradient(to bottom, rgba(8,8,8,0.72) 0%, #080808 100%)"
+          }} />
+        </div>
+
         <motion.div
           className="wrap"
-          style={{ paddingBlock: "80px 72px" }}
+          style={{ paddingBlock: "80px 72px", position: "relative", zIndex: 1, display: "flex", gap: 48, alignItems: "center" }}
           variants={heroReveal}
           initial={motionSafe.initial}
           animate={motionSafe.animate}
         >
+          {/* Left text col */}
+          <div style={{ flex: 1, minWidth: 0 }}>
           {/* Headline block */}
           <motion.div variants={revealItemVariants} style={{ display: "flex", alignItems: "flex-start", gap: 20, marginBottom: 28 }}>
             <div className="pole" style={{ height: 100 }} />
@@ -268,7 +296,192 @@ export default function Home() {
           <motion.p variants={revealItemVariants} style={{ fontSize: 12, color: "var(--t3)", lineHeight: 1.65, marginTop: 18, maxWidth: 520 }}>
             Trusted by Columbia regulars for consistent cuts, clean service, and a no-rush chair experience.
           </motion.p>
+          </div>
+
+          {/* Right mosaic col */}
+          <motion.div variants={revealItemVariants} style={{ flexShrink: 0, display: "none" }} className="hero-mosaic-col">
+            <HeroMosaic />
+          </motion.div>
         </motion.div>
+      </section>
+
+      {/* ══ BENTO GRID ════════════════════════════════ */}
+      <section id="bento" style={{ background: "var(--bg0)", borderTop: LINE }}>
+        <div className="wrap" style={{ paddingBlock: "80px" }}>
+          <div
+            data-bento-grid
+            className="grid grid-cols-1 md:grid-cols-12 gap-5"
+          >
+            {/* Card A — Hero/CTA */}
+            <motion.div
+              data-bento-card="A"
+              className="md:col-span-8 md:row-span-2 col-span-12"
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0 * 0.06 }}
+              style={{
+                background: "var(--bg2)",
+                border: LINE,
+                borderRadius: 16,
+                boxShadow: "var(--glow-gold)",
+                overflow: "hidden",
+                position: "relative",
+                minHeight: 340,
+                padding: "40px 36px",
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "flex-end",
+              }}
+            >
+              <div style={{ position: "absolute", inset: 0, zIndex: 0 }}>
+                <Image
+                  src="https://images.pexels.com/photos/1319460/pexels-photo-1319460.jpeg?auto=compress&w=1200&h=700&fit=crop"
+                  alt="A1 Cuts premium barbershop interior"
+                  fill
+                  sizes="(max-width: 768px) 100vw, 66vw"
+                  style={{ objectFit: "cover", opacity: 0.22 }}
+                />
+                <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(8,8,8,0.95) 30%, rgba(8,8,8,0.4) 100%)" }} />
+              </div>
+              <div style={{ position: "relative", zIndex: 1 }}>
+                <h2 style={{ fontFamily: "Georgia,serif", fontSize: "clamp(28px,4vw,48px)", fontWeight: 700, color: "var(--t1)", lineHeight: 1.1, marginBottom: 12 }}>
+                  Premium Cuts.<br /><span style={{ color: G }}>Classic Craft.</span>
+                </h2>
+                <p style={{ fontSize: 14, color: "var(--t2)", marginBottom: 24, maxWidth: 480 }}>
+                  Columbia's go-to spot for sharp fades, clean lineups, and old-school barber craft since 2010.
+                </p>
+                <div style={{ display: "flex", gap: "24px 48px", flexWrap: "wrap", marginBottom: 28, paddingTop: 20, borderTop: LINE }}>
+                  {[["10+","Years Open"], ["3","Expert Barbers"], ["5★","Rated"]].map(([n, l]) => (
+                    <div key={l}>
+                      <div style={{ fontFamily: "Georgia,serif", fontSize: 22, fontWeight: 700, color: G }}>{n}</div>
+                      <div style={{ fontSize: 10, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--t3)", marginTop: 2 }}>{l}</div>
+                    </div>
+                  ))}
+                </div>
+                <motion.button
+                  type="button"
+                  onClick={openBookingDrawer}
+                  whileHover={!reducedMotion ? cardInteraction.whileHover : undefined}
+                  whileTap={!reducedMotion ? cardInteraction.whileTap : undefined}
+                  transition={springTransition}
+                  style={{
+                    display: "inline-flex", alignItems: "center", gap: 8,
+                    padding: "12px 24px", background: G, color: "#080808",
+                    border: "none", cursor: "pointer",
+                    fontSize: 11, fontWeight: 700, letterSpacing: "0.2em", textTransform: "uppercase",
+                    fontFamily: "system-ui,sans-serif", borderRadius: 6,
+                  }}
+                >
+                  <Scissors size={13} /> BOOK APPOINTMENT
+                </motion.button>
+              </div>
+            </motion.div>
+
+            {/* Card B — Gallery strip */}
+            <motion.div
+              data-bento-card="B"
+              className="md:col-span-4 col-span-12"
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 1 * 0.06 }}
+              style={{
+                background: "var(--bg2)",
+                border: LINE,
+                borderRadius: 16,
+                boxShadow: "var(--glow-gold)",
+                overflow: "hidden",
+                display: "flex",
+                flexDirection: "column",
+                gap: 4,
+                padding: 4,
+              }}
+            >
+              {[
+                { src: "https://images.pexels.com/photos/2076940/pexels-photo-2076940.jpeg?auto=compress&w=640&h=640&fit=crop", alt: "Close-up fade cut detail" },
+                { src: "https://images.pexels.com/photos/1570807/pexels-photo-1570807.jpeg?auto=compress&w=640&h=640&fit=crop", alt: "Barber at work on client" },
+                { src: "https://images.pexels.com/photos/897262/pexels-photo-897262.jpeg?auto=compress&w=640&h=640&fit=crop", alt: "Classic barbershop chair" },
+              ].map((img) => (
+                <div key={img.src} style={{ position: "relative", width: "100%", paddingTop: "100%", overflow: "hidden", borderRadius: 12, flexShrink: 0 }}>
+                  <Image
+                    src={img.src}
+                    alt={img.alt}
+                    fill
+                    sizes="(max-width: 768px) 100vw, 33vw"
+                    style={{ objectFit: "cover", transition: "transform 0.4s ease" }}
+                    className="bento-gallery-img"
+                  />
+                </div>
+              ))}
+            </motion.div>
+
+            {/* Card C — Services menu */}
+            <motion.div
+              data-bento-card="C"
+              className="md:col-span-4 col-span-12"
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 2 * 0.06 }}
+              style={{
+                background: "var(--bg2)",
+                border: LINE,
+                borderRadius: 16,
+                boxShadow: "var(--glow-gold)",
+                padding: "28px 24px",
+                overflow: "hidden",
+              }}
+            >
+              <Label icon={Scissors} text="Services" />
+              <div style={{ display: "flex", flexDirection: "column", gap: 2, maxHeight: 360, overflowY: "auto" }}>
+                {SERVICES.map((s) => (
+                  <div key={s.name} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 0", borderBottom: LINE }}>
+                    <div>
+                      <div style={{ fontFamily: "Georgia,serif", fontSize: 15, color: "var(--t1)" }}>{s.name}</div>
+                      <div style={{ fontSize: 11, color: "var(--t3)", marginTop: 2 }}>{s.duration}</div>
+                    </div>
+                    <div style={{ fontFamily: "Georgia,serif", fontSize: 18, color: G, flexShrink: 0 }}>{s.price}</div>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+
+            {/* Card D — Testimonials */}
+            <motion.div
+              data-bento-card="D"
+              className="md:col-span-8 col-span-12"
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 3 * 0.06 }}
+              style={{
+                background: "var(--bg2)",
+                border: LINE,
+                borderRadius: 16,
+                boxShadow: "var(--glow-gold)",
+                padding: "28px 24px",
+                overflow: "hidden",
+              }}
+            >
+              <Label icon={Star} text="Social Proof" />
+              <div style={{ display: "flex", gap: 16, overflowX: "auto", paddingBottom: 8 }}>
+                {TESTIMONIALS.map((t) => (
+                  <div key={t.name} style={{ flexShrink: 0, width: 240, background: "var(--bg1)", border: LINE, borderRadius: 12, padding: "20px 18px" }}>
+                    <div style={{ display: "flex", gap: 2, marginBottom: 10 }}>
+                      {Array.from({ length: t.rating }).map((_, i) => (
+                        <Star key={i} size={11} style={{ color: G }} />
+                      ))}
+                    </div>
+                    <p style={{ fontSize: 13, color: "var(--t2)", lineHeight: 1.6, marginBottom: 12 }}>&ldquo;{t.quote}&rdquo;</p>
+                    <div style={{ fontSize: 11, color: G, fontFamily: "system-ui,sans-serif", letterSpacing: "0.1em" }}>{t.name}</div>
+                    <div style={{ fontSize: 10, color: "var(--t3)", marginTop: 2 }}>{t.service}</div>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          </div>
+        </div>
       </section>
 
       {/* ══ SERVICES ══════════════════════════════════ */}
