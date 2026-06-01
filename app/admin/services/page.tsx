@@ -4,46 +4,56 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Plus, Pencil, Trash2, Check, X, ToggleLeft, ToggleRight } from "lucide-react";
 import { createRevealVariants, revealItemVariants } from "@/lib/motion";
-
-// TODO: Replace with Convex mutations for real CRUD
-type Service = {
-  id: string;
-  name: string;
-  duration: number; // minutes
-  price: number; // USD
-  active: boolean;
-  description?: string;
-};
-
-const INITIAL_SERVICES: Service[] = [
-  { id: "s1", name: "Classic Cut", duration: 45, price: 35, active: true, description: "Traditional haircut with clippers and scissors." },
-  { id: "s2", name: "Skin Fade", duration: 60, price: 45, active: true, description: "High skin fade with detailed blending." },
-  { id: "s3", name: "Cut + Beard", duration: 75, price: 55, active: true, description: "Full haircut with beard shape-up and line." },
-  { id: "s4", name: "Hot Towel Shave", duration: 45, price: 40, active: true, description: "Relaxing straight-razor shave with hot towel." },
-  { id: "s5", name: "Lineup", duration: 20, price: 20, active: true, description: "Edge-up and shape with straight razor." },
-  { id: "s6", name: "Kids Cut", duration: 30, price: 25, active: false, description: "Haircut for clients under 12." },
-];
+import { useQuery, useMutation } from "convex/react";
+import { api } from "@/convex/_generated/api";
+import type { Id } from "@/convex/_generated/dataModel";
 
 const containerVariants = createRevealVariants(0.05, 0);
 
-type EditState = Partial<Omit<Service, "id">>;
+type EditState = {
+  name?: string;
+  durationMinutes?: number;
+  priceCents?: number;
+  isActive?: boolean;
+  description?: string;
+};
+
+type NewSvc = {
+  name: string;
+  durationMinutes: number;
+  priceCents: number;
+  isActive: boolean;
+  description: string;
+};
 
 export default function AdminServicesPage() {
-  const [services, setServices] = useState<Service[]>(INITIAL_SERVICES);
+  const services = useQuery(api.services.listServices, { activeOnly: false });
+  const createService = useMutation(api.services.createService);
+  const updateService = useMutation(api.services.updateService);
+  const deleteService = useMutation(api.services.deleteService);
+
   const [editId, setEditId] = useState<string | null>(null);
   const [editState, setEditState] = useState<EditState>({});
   const [showAdd, setShowAdd] = useState(false);
-  const [newSvc, setNewSvc] = useState<Omit<Service, "id">>({ name: "", duration: 45, price: 35, active: true, description: "" });
+  const [newSvc, setNewSvc] = useState<NewSvc>({ name: "", durationMinutes: 45, priceCents: 3500, isActive: true, description: "" });
+  const [saving, setSaving] = useState(false);
 
-  function startEdit(svc: Service) {
-    setEditId(svc.id);
-    setEditState({ name: svc.name, duration: svc.duration, price: svc.price, active: svc.active, description: svc.description });
-  }
-
-  function saveEdit(id: string) {
-    setServices((prev) => prev.map((s) => s.id === id ? { ...s, ...editState } : s));
-    setEditId(null);
-    setEditState({});
+  async function saveEdit(id: string) {
+    setSaving(true);
+    try {
+      await updateService({
+        serviceId: id as Id<"services">,
+        name: editState.name,
+        description: editState.description,
+        durationMinutes: editState.durationMinutes,
+        priceCents: editState.priceCents !== undefined ? Math.round(editState.priceCents) : undefined,
+        isActive: editState.isActive,
+      });
+      setEditId(null);
+      setEditState({});
+    } finally {
+      setSaving(false);
+    }
   }
 
   function cancelEdit() {
@@ -51,19 +61,31 @@ export default function AdminServicesPage() {
     setEditState({});
   }
 
-  function toggleActive(id: string) {
-    setServices((prev) => prev.map((s) => s.id === id ? { ...s, active: !s.active } : s));
+  async function toggleActive(id: string, current: boolean) {
+    await updateService({ serviceId: id as Id<"services">, isActive: !current });
   }
 
-  function deleteService(id: string) {
-    setServices((prev) => prev.filter((s) => s.id !== id));
+  async function handleDelete(id: string) {
+    if (!confirm("Delete this service?")) return;
+    await deleteService({ serviceId: id as Id<"services"> });
   }
 
-  function addService() {
+  async function addService() {
     if (!newSvc.name.trim()) return;
-    setServices((prev) => [...prev, { ...newSvc, id: `s${Date.now()}` }]);
-    setNewSvc({ name: "", duration: 45, price: 35, active: true, description: "" });
-    setShowAdd(false);
+    setSaving(true);
+    try {
+      await createService({
+        name: newSvc.name,
+        description: newSvc.description || undefined,
+        durationMinutes: newSvc.durationMinutes,
+        priceCents: Math.round(newSvc.priceCents),
+        isActive: newSvc.isActive,
+      });
+      setNewSvc({ name: "", durationMinutes: 45, priceCents: 3500, isActive: true, description: "" });
+      setShowAdd(false);
+    } finally {
+      setSaving(false);
+    }
   }
 
   const inputStyle = { background: "var(--bg0)", border: "1px solid var(--line)", borderRadius: 6, padding: "5px 8px", color: "var(--t1)", fontSize: 13, outline: "none", width: "100%" };
@@ -98,68 +120,80 @@ export default function AdminServicesPage() {
               </tr>
             </thead>
             <tbody>
-              {services.map((svc) => {
-                const isEditing = editId === svc.id;
-                return (
-                  <tr key={svc.id} style={{ borderBottom: "1px solid var(--line)", background: isEditing ? "rgba(201,168,76,0.04)" : "transparent" }}>
-                    <td style={{ padding: "12px 20px" }}>
-                      {isEditing ? (
-                        <input value={editState.name ?? ""} onChange={(e) => setEditState({ ...editState, name: e.target.value })} style={inputStyle} />
-                      ) : (
-                        <div>
-                          <p style={{ color: "var(--t1)", fontSize: 14, fontWeight: 500 }}>{svc.name}</p>
-                          {svc.description && <p style={{ color: "var(--t2)", fontSize: 12, marginTop: 2 }}>{svc.description}</p>}
-                        </div>
-                      )}
-                    </td>
-                    <td style={{ padding: "12px 20px" }}>
-                      {isEditing ? (
-                        <input type="number" value={editState.duration ?? ""} onChange={(e) => setEditState({ ...editState, duration: Number(e.target.value) })} style={{ ...inputStyle, width: 70 }} />
-                      ) : (
-                        <span style={{ color: "var(--t1)", fontSize: 14 }}>{svc.duration} min</span>
-                      )}
-                    </td>
-                    <td style={{ padding: "12px 20px" }}>
-                      {isEditing ? (
-                        <input type="number" value={editState.price ?? ""} onChange={(e) => setEditState({ ...editState, price: Number(e.target.value) })} style={{ ...inputStyle, width: 80 }} />
-                      ) : (
-                        <span style={{ color: "var(--gold)", fontSize: 14, fontWeight: 600, fontFamily: "var(--font-mono), monospace" }}>${svc.price}</span>
-                      )}
-                    </td>
-                    <td style={{ padding: "12px 20px" }}>
-                      <button onClick={() => toggleActive(svc.id)} style={{ background: "transparent", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: 6 }}>
-                        {svc.active
-                          ? <ToggleRight size={20} style={{ color: "var(--gold)" }} />
-                          : <ToggleLeft size={20} style={{ color: "var(--t3)" }} />}
-                        <span style={{ fontSize: 12, color: svc.active ? "var(--gold)" : "var(--t3)", fontWeight: 500 }}>{svc.active ? "Active" : "Inactive"}</span>
-                      </button>
-                    </td>
-                    <td style={{ padding: "12px 20px" }}>
-                      <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+              {services === undefined ? (
+                <tr><td colSpan={5} style={{ padding: 20, textAlign: "center", color: "var(--t3)", fontSize: 13 }}>Loading…</td></tr>
+              ) : services.length === 0 ? (
+                <tr><td colSpan={5} style={{ padding: 20, textAlign: "center", color: "var(--t3)", fontSize: 13 }}>No services yet. Add your first one.</td></tr>
+              ) : (
+                services.map((svc) => {
+                  const isEditing = editId === svc._id;
+                  return (
+                    <tr key={svc._id} style={{ borderBottom: "1px solid var(--line)", background: isEditing ? "rgba(201,168,76,0.04)" : "transparent" }}>
+                      <td style={{ padding: "12px 20px" }}>
                         {isEditing ? (
-                          <>
-                            <button onClick={() => saveEdit(svc.id)} style={{ background: "rgba(34,197,94,0.12)", border: "1px solid #22c55e", color: "#4ade80", borderRadius: 6, padding: "5px 8px", cursor: "pointer" }}>
-                              <Check size={14} />
-                            </button>
-                            <button onClick={cancelEdit} style={{ background: "rgba(136,136,136,0.10)", border: "1px solid var(--line)", color: "var(--t2)", borderRadius: 6, padding: "5px 8px", cursor: "pointer" }}>
-                              <X size={14} />
-                            </button>
-                          </>
+                          <input value={editState.name ?? ""} onChange={(e) => setEditState({ ...editState, name: e.target.value })} style={inputStyle} />
                         ) : (
-                          <>
-                            <button onClick={() => startEdit(svc)} style={{ background: "var(--bg1)", border: "1px solid var(--line)", color: "var(--t2)", borderRadius: 6, padding: "5px 8px", cursor: "pointer" }}>
-                              <Pencil size={14} />
-                            </button>
-                            <button onClick={() => deleteService(svc.id)} style={{ background: "rgba(239,68,68,0.10)", border: "1px solid #ef4444", color: "#f87171", borderRadius: 6, padding: "5px 8px", cursor: "pointer" }}>
-                              <Trash2 size={14} />
-                            </button>
-                          </>
+                          <div>
+                            <p style={{ color: "var(--t1)", fontSize: 14, fontWeight: 500 }}>{svc.name}</p>
+                            {svc.description && <p style={{ color: "var(--t2)", fontSize: 12, marginTop: 2 }}>{svc.description}</p>}
+                          </div>
                         )}
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
+                      </td>
+                      <td style={{ padding: "12px 20px" }}>
+                        {isEditing ? (
+                          <input type="number" value={editState.durationMinutes ?? ""} onChange={(e) => setEditState({ ...editState, durationMinutes: Number(e.target.value) })} style={{ ...inputStyle, width: 70 }} />
+                        ) : (
+                          <span style={{ color: "var(--t1)", fontSize: 14 }}>{svc.durationMinutes} min</span>
+                        )}
+                      </td>
+                      <td style={{ padding: "12px 20px" }}>
+                        {isEditing ? (
+                          <input type="number" value={editState.priceCents !== undefined ? editState.priceCents / 100 : ""} onChange={(e) => setEditState({ ...editState, priceCents: Number(e.target.value) * 100 })} style={{ ...inputStyle, width: 80 }} />
+                        ) : (
+                          <span style={{ color: "var(--gold)", fontSize: 14, fontWeight: 600, fontFamily: "var(--font-mono), monospace" }}>${(svc.priceCents / 100).toFixed(2)}</span>
+                        )}
+                      </td>
+                      <td style={{ padding: "12px 20px" }}>
+                        <button onClick={() => toggleActive(svc._id, svc.isActive)} style={{ background: "transparent", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: 6 }}>
+                          {svc.isActive
+                            ? <ToggleRight size={20} style={{ color: "var(--gold)" }} />
+                            : <ToggleLeft size={20} style={{ color: "var(--t3)" }} />}
+                          <span style={{ fontSize: 12, color: svc.isActive ? "var(--gold)" : "var(--t3)", fontWeight: 500 }}>{svc.isActive ? "Active" : "Inactive"}</span>
+                        </button>
+                      </td>
+                      <td style={{ padding: "12px 20px" }}>
+                        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                          {isEditing ? (
+                            <>
+                              <button onClick={() => saveEdit(svc._id)} disabled={saving} style={{ background: "rgba(34,197,94,0.12)", border: "1px solid #22c55e", color: "#4ade80", borderRadius: 6, padding: "5px 8px", cursor: "pointer" }}>
+                                <Check size={14} />
+                              </button>
+                              <button onClick={cancelEdit} style={{ background: "rgba(136,136,136,0.10)", border: "1px solid var(--line)", color: "var(--t2)", borderRadius: 6, padding: "5px 8px", cursor: "pointer" }}>
+                                <X size={14} />
+                              </button>
+                            </>
+                          ) : (
+                            <>
+                              <button
+                                onClick={() => {
+                                  setEditId(svc._id);
+                                  setEditState({ name: svc.name, durationMinutes: svc.durationMinutes, priceCents: svc.priceCents, isActive: svc.isActive, description: svc.description });
+                                }}
+                                style={{ background: "var(--bg1)", border: "1px solid var(--line)", color: "var(--t2)", borderRadius: 6, padding: "5px 8px", cursor: "pointer" }}
+                              >
+                                <Pencil size={14} />
+                              </button>
+                              <button onClick={() => handleDelete(svc._id)} style={{ background: "rgba(239,68,68,0.10)", border: "1px solid #ef4444", color: "#f87171", borderRadius: 6, padding: "5px 8px", cursor: "pointer" }}>
+                                <Trash2 size={14} />
+                              </button>
+                            </>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
             </tbody>
           </table>
         </div>
@@ -189,7 +223,7 @@ export default function AdminServicesPage() {
               <div style={{ display: "grid", gap: 14 }}>
                 {[
                   { label: "Service Name", field: "name", type: "text", placeholder: "e.g. Classic Cut" },
-                  { label: "Duration (minutes)", field: "duration", type: "number", placeholder: "45" },
+                  { label: "Duration (minutes)", field: "durationMinutes", type: "number", placeholder: "45" },
                   { label: "Price (USD)", field: "price", type: "number", placeholder: "35" },
                   { label: "Description", field: "description", type: "text", placeholder: "Brief description..." },
                 ].map((f) => (
@@ -198,14 +232,22 @@ export default function AdminServicesPage() {
                     <input
                       type={f.type}
                       placeholder={f.placeholder}
-                      value={String(newSvc[f.field as keyof typeof newSvc] ?? "")}
-                      onChange={(e) => setNewSvc({ ...newSvc, [f.field]: f.type === "number" ? Number(e.target.value) : e.target.value })}
+                      value={f.field === "price" ? (newSvc.priceCents / 100) : String(newSvc[f.field as keyof typeof newSvc] ?? "")}
+                      onChange={(e) => {
+                        if (f.field === "price") {
+                          setNewSvc({ ...newSvc, priceCents: Number(e.target.value) * 100 });
+                        } else if (f.field === "durationMinutes") {
+                          setNewSvc({ ...newSvc, durationMinutes: Number(e.target.value) });
+                        } else {
+                          setNewSvc({ ...newSvc, [f.field]: e.target.value });
+                        }
+                      }}
                       style={{ width: "100%", background: "var(--bg2)", border: "1px solid var(--line)", borderRadius: 8, padding: "9px 12px", color: "var(--t1)", fontSize: 13, outline: "none" }}
                     />
                   </div>
                 ))}
-                <button onClick={addService} style={{ marginTop: 4, width: "100%", padding: "12px", background: "var(--gold)", border: "none", borderRadius: 10, color: "#080808", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
-                  Add Service
+                <button onClick={addService} disabled={saving} style={{ marginTop: 4, width: "100%", padding: "12px", background: "var(--gold)", border: "none", borderRadius: 10, color: "#080808", fontSize: 13, fontWeight: 700, cursor: "pointer", opacity: saving ? 0.7 : 1 }}>
+                  {saving ? "Adding…" : "Add Service"}
                 </button>
               </div>
             </motion.div>

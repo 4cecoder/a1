@@ -4,30 +4,17 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { CalendarDays, Users, TrendingUp, Briefcase, Plus, UserPlus, ArrowRight } from "lucide-react";
 import { createRevealVariants, revealItemVariants } from "@/lib/motion";
+import { useQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
 
-// TODO: Replace mock data with Convex useQuery hooks when backend queries are wired
-const MOCK_KPI = {
-  todayRevenue: 68500, // cents
-  upcomingAppointments: 7,
-  activeClients: 142,
-  newLeadsThisWeek: 11,
-};
-
-const MOCK_APPOINTMENTS = [
-  { id: "a1", client: "Jordan Miles", service: "Skin Fade", time: "10:00 AM", status: "confirmed" },
-  { id: "a2", client: "Chris Bennett", service: "Cut + Beard", time: "11:30 AM", status: "scheduled" },
-  { id: "a3", client: "Andre Cole", service: "Classic Cut", time: "1:00 PM", status: "completed" },
-  { id: "a4", client: "Monica Reed", service: "Fade", time: "2:30 PM", status: "confirmed" },
-  { id: "a5", client: "Sam Everett", service: "Hot Towel Shave", time: "4:00 PM", status: "cancelled" },
-];
-
-type AppointmentStatus = "scheduled" | "confirmed" | "completed" | "cancelled";
+type AppointmentStatus = "scheduled" | "confirmed" | "completed" | "cancelled" | "no_show";
 
 const STATUS_STYLES: Record<AppointmentStatus, { bg: string; color: string; label: string }> = {
   scheduled: { bg: "rgba(201,168,76,0.15)", color: "#C9A84C", label: "Scheduled" },
   confirmed: { bg: "rgba(34,197,94,0.12)", color: "#4ade80", label: "Confirmed" },
   completed: { bg: "rgba(136,136,136,0.15)", color: "#888", label: "Completed" },
   cancelled: { bg: "rgba(239,68,68,0.12)", color: "#f87171", label: "Cancelled" },
+  no_show: { bg: "rgba(239,68,68,0.08)", color: "#f87171", label: "No Show" },
 };
 
 const containerVariants = createRevealVariants(0.07, 0);
@@ -40,8 +27,15 @@ const quickModules: Array<{ label: string; href: string }> = [
   { label: "Settings", href: "/admin/settings" },
 ];
 
+function formatTime(ts: number): string {
+  return new Date(ts).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
+}
+
 export default function AdminOverviewPage() {
-  const revenueFormatted = `$${(MOCK_KPI.todayRevenue / 100).toFixed(2)}`;
+  const kpis = useQuery(api.dashboard.getDashboardKpis);
+
+  const todayRevenueCents = kpis?.todayRevenueCents ?? 0;
+  const revenueFormatted = `$${(todayRevenueCents / 100).toFixed(2)}`;
 
   return (
     <motion.div
@@ -69,10 +63,10 @@ export default function AdminOverviewPage() {
         style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 14 }}
       >
         {[
-          { icon: TrendingUp, label: "Today's Revenue", value: revenueFormatted, accent: true },
-          { icon: CalendarDays, label: "Upcoming Appointments", value: String(MOCK_KPI.upcomingAppointments), accent: false },
-          { icon: Users, label: "Active Clients", value: String(MOCK_KPI.activeClients), accent: false },
-          { icon: Briefcase, label: "New Leads This Week", value: String(MOCK_KPI.newLeadsThisWeek), accent: false },
+          { icon: TrendingUp, label: "Today's Revenue", value: kpis ? revenueFormatted : "—", accent: true },
+          { icon: CalendarDays, label: "Upcoming Appointments", value: kpis ? String(kpis.upcomingAppointments) : "—", accent: false },
+          { icon: Users, label: "Active Clients", value: kpis ? String(kpis.activeClients) : "—", accent: false },
+          { icon: Briefcase, label: "New Leads This Week", value: kpis ? String(kpis.newLeadsThisWeek) : "—", accent: false },
         ].map((kpi) => (
           <div
             key={kpi.label}
@@ -158,21 +152,31 @@ export default function AdminOverviewPage() {
               </tr>
             </thead>
             <tbody>
-              {MOCK_APPOINTMENTS.map((appt) => {
-                const s = STATUS_STYLES[appt.status as AppointmentStatus] ?? STATUS_STYLES.scheduled;
-                return (
-                  <tr key={appt.id} style={{ borderBottom: "1px solid var(--line)" }}>
-                    <td style={{ padding: "12px 20px", color: "var(--t1)", fontSize: 14 }}>{appt.client}</td>
-                    <td style={{ padding: "12px 20px", color: "var(--t2)", fontSize: 13 }}>{appt.service}</td>
-                    <td style={{ padding: "12px 20px", color: "var(--t2)", fontSize: 13 }}>{appt.time}</td>
-                    <td style={{ padding: "12px 20px" }}>
-                      <span style={{ background: s.bg, color: s.color, padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 600, letterSpacing: "0.06em" }}>
-                        {s.label}
-                      </span>
-                    </td>
-                  </tr>
-                );
-              })}
+              {kpis === undefined ? (
+                <tr>
+                  <td colSpan={4} style={{ padding: "20px", textAlign: "center", color: "var(--t3)", fontSize: 13 }}>Loading…</td>
+                </tr>
+              ) : kpis.recentAppointments.length === 0 ? (
+                <tr>
+                  <td colSpan={4} style={{ padding: "20px", textAlign: "center", color: "var(--t3)", fontSize: 13 }}>No appointments yet.</td>
+                </tr>
+              ) : (
+                kpis.recentAppointments.map((appt) => {
+                  const s = STATUS_STYLES[appt.status as AppointmentStatus] ?? STATUS_STYLES.scheduled;
+                  return (
+                    <tr key={appt._id} style={{ borderBottom: "1px solid var(--line)" }}>
+                      <td style={{ padding: "12px 20px", color: "var(--t1)", fontSize: 14 }}>{appt.clientName}</td>
+                      <td style={{ padding: "12px 20px", color: "var(--t2)", fontSize: 13 }}>{appt.serviceName}</td>
+                      <td style={{ padding: "12px 20px", color: "var(--t2)", fontSize: 13 }}>{formatTime(appt.startAt)}</td>
+                      <td style={{ padding: "12px 20px" }}>
+                        <span style={{ background: s.bg, color: s.color, padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 600, letterSpacing: "0.06em" }}>
+                          {s.label}
+                        </span>
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
             </tbody>
           </table>
         </div>

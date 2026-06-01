@@ -5,6 +5,8 @@ import { usePathname } from "next/navigation";
 import { BarChart3, CalendarDays, CreditCard, LayoutDashboard, Settings, Users, UserSquare2, Briefcase, Scissors, Clock3 } from "lucide-react";
 import type { AdminRole } from "@/lib/admin/auth";
 import type { ComponentType } from "react";
+import { useQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
 
 type AdminSidebarProps = {
   role: AdminRole;
@@ -16,13 +18,14 @@ type NavItem = {
   label: string;
   href: string;
   icon: ComponentType<{ size?: number }>;
+  badge?: boolean;
 };
 
 const NAV_ITEMS: NavItem[] = [
   { label: "Overview", href: "/admin", icon: LayoutDashboard },
   { label: "Appointments", href: "/admin/appointments", icon: CalendarDays },
   { label: "Clients", href: "/admin/clients", icon: Users },
-  { label: "Leads", href: "/admin/leads", icon: Briefcase },
+  { label: "Leads", href: "/admin/leads", icon: Briefcase, badge: true },
   { label: "Staff", href: "/admin/staff", icon: UserSquare2 },
   { label: "Services", href: "/admin/services", icon: Scissors },
   { label: "Billing", href: "/admin/billing", icon: CreditCard },
@@ -39,6 +42,7 @@ function isActive(pathname: string, href: string): boolean {
 
 function SidebarContent({ role, onClose }: { role: AdminRole; onClose: () => void }) {
   const pathname = usePathname();
+  const newLeadsCount = useQuery(api.dashboard.getNewLeadsCount);
 
   return (
     <>
@@ -52,6 +56,7 @@ function SidebarContent({ role, onClose }: { role: AdminRole; onClose: () => voi
         {NAV_ITEMS.map((item) => {
           const active = isActive(pathname, item.href);
           const Icon = item.icon;
+          const showBadge = item.badge && newLeadsCount !== undefined && newLeadsCount > 0;
 
           return (
             <Link
@@ -72,7 +77,23 @@ function SidebarContent({ role, onClose }: { role: AdminRole; onClose: () => voi
               }}
             >
               <Icon size={15} />
-              {item.label}
+              <span style={{ flex: 1 }}>{item.label}</span>
+              {showBadge && (
+                <span
+                  style={{
+                    background: "var(--gold)",
+                    color: "#080808",
+                    borderRadius: 999,
+                    fontSize: 10,
+                    fontWeight: 700,
+                    padding: "1px 6px",
+                    minWidth: 18,
+                    textAlign: "center",
+                  }}
+                >
+                  {newLeadsCount! > 99 ? "99+" : newLeadsCount}
+                </span>
+              )}
             </Link>
           );
         })}

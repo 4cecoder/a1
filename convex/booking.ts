@@ -131,6 +131,83 @@ export const listAppointmentsByDate = query({
   },
 });
 
+// Public booking mutation — no authentication required
+export const createPublicAppointment = mutation({
+  args: {
+    serviceId: v.id("services"),
+    startAt: v.number(),
+    endAt: v.number(),
+    customerName: v.string(),
+    customerEmail: v.optional(v.string()),
+    customerPhone: v.optional(v.string()),
+    notes: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    if (args.endAt <= args.startAt) {
+      throw new ConvexError("Invalid appointment window");
+    }
+
+    const service = await ctx.db.get(args.serviceId);
+    if (!service) throw new ConvexError("Service not found");
+
+    const now = Date.now();
+
+    // Find or create a walk-in client record
+    let clientId = await ctx.db
+      .query("clients")
+      .withIndex("by_email", (q) => q.eq("email", args.customerEmail ?? ""))
+      .unique()
+      .then((c) => c?._id ?? null);
+
+    if (!clientId) {
+      const nameParts = args.customerName.trim().split(/\s+/);
+      const firstName = nameParts[0] ?? args.customerName;
+      const lastName = nameParts.slice(1).join(" ");
+      clientId = await ctx.db.insert("clients", {
+        firstName,
+        lastName,
+        fullName: args.customerName.trim(),
+        email: args.customerEmail,
+        phone: args.customerPhone,
+        status: "active",
+        tags: [],
+        preferredServices: [service.name],
+        joinedAt: now,
+        totalVisits: 0,
+        lifetimeValueCents: 0,
+        timeline: [
+          {
+            at: now,
+            label: "Booked online",
+            detail: `Booked ${service.name} via public booking page`,
+            type: "lifecycle",
+          },
+        ],
+        createdAt: now,
+        updatedAt: now,
+      });
+    }
+
+    const appointmentId = await ctx.db.insert("appointments", {
+      clientId,
+      serviceId: args.serviceId,
+      status: "scheduled",
+      startAt: args.startAt,
+      endAt: args.endAt,
+      customerName: args.customerName.trim(),
+      customerEmail: args.customerEmail,
+      priceCents: service.priceCents,
+      currency: "USD",
+      paymentStatus: "pending",
+      notes: args.notes,
+      createdAt: now,
+      updatedAt: now,
+    });
+
+    return { appointmentId };
+  },
+});
+
 export const listAppointmentsByClient = query({
   args: {
     clientId: v.id("clients"),

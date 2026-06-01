@@ -11,9 +11,12 @@
 import type * as auth from "../auth.js";
 import type * as booking from "../booking.js";
 import type * as crm from "../crm.js";
+import type * as dashboard from "../dashboard.js";
 import type * as notifications from "../notifications.js";
 import type * as roles from "../roles.js";
 import type * as seed from "../seed.js";
+import type * as services from "../services.js";
+import type * as staff from "../staff.js";
 import type * as users from "../users.js";
 
 import type {
@@ -26,9 +29,12 @@ declare const fullApi: ApiFromModules<{
   auth: typeof auth;
   booking: typeof booking;
   crm: typeof crm;
+  dashboard: typeof dashboard;
   notifications: typeof notifications;
   roles: typeof roles;
   seed: typeof seed;
+  services: typeof services;
+  staff: typeof staff;
   users: typeof users;
 }>;
 
