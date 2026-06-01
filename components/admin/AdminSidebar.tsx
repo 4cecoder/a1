@@ -21,14 +21,14 @@ type NavItem = {
 const NAV_ITEMS: NavItem[] = [
   { label: "Overview", href: "/admin", icon: LayoutDashboard },
   { label: "Appointments", href: "/admin/appointments", icon: CalendarDays },
-  { label: "Clients", href: "/admin#clients", icon: Users },
+  { label: "Clients", href: "/admin/clients", icon: Users },
+  { label: "Leads", href: "/admin/leads", icon: Briefcase },
   { label: "Staff", href: "/admin/staff", icon: UserSquare2 },
   { label: "Services", href: "/admin/services", icon: Scissors },
   { label: "Billing", href: "/admin/billing", icon: CreditCard },
+  { label: "Schedule", href: "/admin/schedule", icon: Clock3 },
+  { label: "Reports", href: "/admin/reports", icon: BarChart3 },
   { label: "Settings", href: "/admin/settings", icon: Settings },
-  { label: "Reports", href: "/admin#reports", icon: BarChart3 },
-  { label: "Schedule", href: "/admin#schedule", icon: Clock3 },
-  { label: "Leads", href: "/admin#leads", icon: Briefcase },
 ];
 
 function isActive(pathname: string, href: string): boolean {

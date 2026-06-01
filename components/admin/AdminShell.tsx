@@ -5,6 +5,7 @@ import type { ReactNode } from "react";
 import type { AdminRole } from "@/lib/admin/auth";
 import AdminSidebar from "./AdminSidebar";
 import AdminTopbar from "./AdminTopbar";
+import AdminMobileBottomNav from "./AdminMobileBottomNav";
 
 type AdminShellProps = {
   role: AdminRole;
@@ -20,10 +21,12 @@ export default function AdminShell({ role, children }: AdminShellProps) {
 
       <div style={{ flex: 1, minWidth: 0 }}>
         <AdminTopbar role={role} onOpenMobileNav={() => setMobileOpen(true)} />
-        <main style={{ padding: 20 }}>
+        <main style={{ padding: 20, paddingBottom: 80 }}>
           <div style={{ maxWidth: 1100, margin: "0 auto" }}>{children}</div>
         </main>
       </div>
+
+      <AdminMobileBottomNav />
     </div>
   );
 }
